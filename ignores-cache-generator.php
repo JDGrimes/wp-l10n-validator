@@ -19,14 +19,9 @@ include_once __DIR__ . '/wp-l10n-validator.php';
  */
 class WP_L10n_Specific_Ignores_Generator extends WP_L10n_Validator {
 
-	/**
-	 * The path to the cache file.
-	 *
-	 * @since 0.1.0
-	 *
-	 * @type string $cache_file
-	 */
-	private static $cache_file;
+	//
+	// Private Vars.
+	//
 
 	/**
 	 * Holds the generated list of ignores.
@@ -36,6 +31,10 @@ class WP_L10n_Specific_Ignores_Generator extends WP_L10n_Validator {
 	 * @type array $ignores
 	 */
 	private $ignores = array();
+
+	//
+	// Public Methods.
+	//
 
 	/**
 	 * Cache the specific ignores to a file.
@@ -48,11 +47,20 @@ class WP_L10n_Specific_Ignores_Generator extends WP_L10n_Validator {
 	 */
 	public function write_cache( $file ) {
 
-		if ( empty( $file ) )
-			$file = $this->basedir . 'wp-l10n-validator-cache.json';
+		if ( empty( $file ) ) {
+
+			if ( ! empty( self::$config['ignores-cache'] ) )
+				$file = self::resolve_path( self::$config['ignores-cache'] );
+			else
+				$file = $this->basedir . '/wp-l10n-validator-ignores.json';
+		}
 
 		return parent::save_json_file( $file, $this->ignores );
 	}
+
+	//
+	// Protected Methods.
+	//
 
 	/**
 	 * Report some non-gettexted text.
@@ -73,41 +81,16 @@ class WP_L10n_Specific_Ignores_Generator extends WP_L10n_Validator {
 	 */
 	protected function report_invalid_l10n_arg() {}
 
-	/**
-	 * Report an unexpected textdomain.
+	/**#@+
+	 * Ignore reports for anything other than non-gettexted strings.
 	 *
 	 * @since 0.1.0
-	 *
-	 * @param string $text The unexpected textdomain.
 	 */
 	protected function report_unexpected_textdomain( $text ) {}
-
-	/**
-	 * Report a function that has less than the required arguments.
-	 *
-	 * @since 0.1.0
-	 *
-	 * @param int $required_args The number of arguments required by the function.
-	 */
 	protected function report_required_args( $required_args ) {}
-
-	/**
-	 * Report the use of a deprecated l10n function.
-	 *
-	 * @since 0.1.0
-	 *
-	 * @param string $function The name of the deprecated function.
-	 */
 	protected function report_deprecated_l10n_function( $function ) {}
-
-	/**
-	 * Callback for debugging.
-	 *
-	 * This callback is triggered by the debug token.
-	 *
-	 * @since 0.1.0
-	 */
 	protected function debug_callback() {}
+	/**#@-*/
 
 	//
 	// Public Static Methods.

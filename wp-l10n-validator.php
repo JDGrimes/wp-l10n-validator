@@ -3,49 +3,11 @@
 /**
  * Command line app to parse non-gettexted strings from files.
  *
- * Though written primarily as a CLI app, it may also be used directly. It may be
- * used to validate a single file, or an entire directory (including any and all
+ * Though written primarily as a CLI app, it may also be used directly. It can
+ * validate a single file, or an entire directory (including any and all
  * levels of subdirectories). Only the later option is available from the default
- * CLI usage, although it is possible to extend this as needed (see below).
- *
- * Because of its usage of RecursiveDirectoryIterator, this project requires PHP 5.3.
- * However, by implementing your own parser() method in a subclass, you can
- * circumvent this particular restraint.
- *
- * The validator attempts to do the following:
- * * Find any untranslated strings in HTML
- * * Find any untranslated 'encapsed strings' in PHP source code
- * * Make sure all gettext function parameters are valid - no variables, function
- *   calls, etc., where there should just be an encapsed string - and all required
- *   arguments are present.
- * * Make sure the expected textdomain(s) are always used
- * * As a side, it also checks that no l10n functions are deprecated.
- *
- * This parsing can result in many false positives, but this is better than false
- * negatives. The strategy employed for weeding out most false positives is as
- * follows:
- * * Ignore non-tranlatable strings inside calls to certain functions
- * * Ignore strings that are pure HTML
- * * Ignore strings that are array keys
- * * Ignore specific function arguments that don't need to be gettexted
- * * Ignore specific strings
- * * Ignore specific string occurrances
- *
- * All of these are configurable to match your particular project, though custom
- * configuration is optional. To configure the parser, you need to specify a config
- * file. There are two ways of doing this. One is by including a wp-l10n-validator.json
- * file in the root directory of your project (or wherever you wish to run the
- * parser from via the CLI). Alternately, you can specify the file to use by setting
- * the WP_L10N_VALIDATOR_CONFIG environment variable. A config file in the working
- * directory takes precedence.
- *
- * In your config file you can specify functions, function arguments, and strings to
- * ignore, or remove any of the default one's from the ignored list. You can do this
- * by accessing the class's ignored_functions, ignored_function_args, and
- * ignored_strings properties.
- *
- * You can also write your own child class to extend the validator. This allows you
- * to change output method by overriding the report_* functions.
+ * CLI usage, although it is possible to extend this as needed. See the README.md
+ * file for more information.
  *
  * @link http://plugins.svn.wordpress.org/codestyling-localization/trunk/codestyling-localization.php Revision 778516 (~1.99.30)
  *
@@ -57,11 +19,10 @@
  *
  *
  * @todo -
- *       ? Add removal functions
- *       ? Stop-on-error option
  *       ? parse single file from the command line
  *       ? Allow directory/files to be excluded
- *       ? Ignore function declarations
+ *       * Ignore child class methods based on parent class
+ *       * re-parse cached files with errors
  */
 
 /**
@@ -71,6 +32,8 @@
  * the gettext localization of a PHP project, either via the commandline or from
  * another script. It is also highly customizable, either by setting different
  * options and/or by extending the class.
+ *
+ * @since 0.1.0
  */
 class WP_L10n_Validator {
 
@@ -213,7 +176,7 @@ class WP_L10n_Validator {
 	protected $non_string_l10n_args = array();
 
 	//
-	// Protected Static Methods.
+	// Protected Static Vars.
 	//
 
 	/**
@@ -526,14 +489,16 @@ class WP_L10n_Validator {
 	 */
 	public function parse() {
 
+		$base_length = strlen( $this->basedir );
+
 		foreach ( new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $this->basedir ) ) as $filename ) {
 
 			if ( $filename->getExtension() != 'php' )
 				continue;
 
-			$this->filename = str_replace( $this->basedir, '', $filename );
+			$this->filename = substr( $filename, $base_length );
 
-			 if ( $this->_parse_file() )
+			 if ( $this->_parse_file() && $this->one_by_one )
 			 	break;
 		}
 
@@ -1514,9 +1479,7 @@ class WP_L10n_Validator {
 
 			$args = static::parse_cli_args( $argv );
 
-			$class = get_called_class();
-
-			$parser = new $class( $args['basedir'], $args['textdomain'] );
+			$parser = static::__construct( $args['basedir'], $args['textdomain'] );
 
 			switch ( $args['config'] ) {
 

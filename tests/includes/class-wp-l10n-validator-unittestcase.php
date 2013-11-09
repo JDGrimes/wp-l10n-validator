@@ -153,7 +153,6 @@ class WP_L10n_Validator_UnitTestCase extends PHPUnit_Framework_TestCase {
 					$unexpected_errors[ $type ][] = $error;
 			}
 		}
-//var_log( self::$errors, self::$expected_errors );
 
 		if ( count( $unexpected_errors ) > 0 ) {
 
