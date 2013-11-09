@@ -924,31 +924,16 @@ class WP_L10n_Validator {
 					break;
 
 					case ',':
-						if ( ! $this->args_started && $this->cur_func ) {
-
-							/*
-							 * The "function" we are currently in, doesn't seem to
-							 * have been real. It was just an argument within another
-							 * function, that sorta' looked like it might have been a
-							 * function itself. It wasn't. Move up the stack.
-							 */
-							$this->_exit_function( true, true );
-						}
+						// Exit the current function if its arguments haven't started.
+						$this->_exit_function( true );
 
 						if ( $this->args_started )
 							$this->cur_func['arg_count']++;
 					break;
 
 					case ')':
-						if ( ! $this->args_started && $this->cur_func ) {
-
-							/*
-							 * What looked remarkebly like it could have been a call
-							 * to a function, turned out to be nothing more than ...
-							 * something else. So, we move up the stack.
-							 */
-							$this->_exit_function( true, true );
-						}
+						// Exit the current function if its arguments haven't started.
+						$this->_exit_function( true );
 
 						if ( ! $this->cur_func )
 							break;
@@ -968,7 +953,7 @@ class WP_L10n_Validator {
 								}
 							}
 
-							$this->_exit_function( false );
+							$this->_exit_function();
 						}
 					break;
 
@@ -1098,37 +1083,35 @@ class WP_L10n_Validator {
 			'arg_count'    => 0,
 			'parentheses'  => 0,
 		);
-	}
+
+	} // function _enter_function()
 
 	/**
 	 * Exit the current function.
 	 *
-	 * It can be used to exit only a single level, or up multiple levels, if
-	 * $multi_level is true (defualt). When exiting multiple levels in the stack, it
-	 * can exit only up until it gets to a function whose arguments have started, or
-	 * it can also exit that first real function with started arguments (default).
+	 * This function can either exit only if the current function's arguments haven't
+	 * started, or also the first function whose arguments have started.
 	 *
 	 * @since 0.1.0
 	 *
-	 * @param bool $multi_level    Whether to exit only a single level, or up until
-	 *        we find a function whose arguments have started.
-	 * @param bool $only_unstarted Whether to only exit functions whose arguments
+	 * @param bool $only_unstarted Whether to only exit the function if its arguments
 	 *        haven't started.
 	 *
 	 * @return void
 	 */
-	private function _exit_function( $multi_level = true, $only_unstarted = false ) {
+	private function _exit_function( $only_unstarted = false ) {
 
-		if ( $multi_level ) {
+		if ( ! $this->args_started && 'recursive' != $only_unstarted ) {
 
-			while ( ! $this->args_started && $this->cur_func ) {
+			// Move up the stack.
+			$this->_exit_function( 'recursive' );
 
-				// Move up the stack.
-				$this->_exit_function( false );
-			}
-
-			if ( $only_unstarted )
+			if ( $only_unstarted || ! $this->cur_func )
 				return;
+
+		} elseif ( $only_unstarted === true ) {
+
+			return;
 		}
 
 		// Move up the stack one level.
@@ -1141,7 +1124,7 @@ class WP_L10n_Validator {
 
 		} else {
 
-			$this->args_started = $this->cur_func['args_started'];
+			$this->args_started = true;
 		}
 	}
 
@@ -1161,7 +1144,7 @@ class WP_L10n_Validator {
 		if ( $this->cur_func && ! $this->args_started ) {
 
 			// If the arguments hadn't started, this wasn't a real function.
-			$this->_exit_function( true, true );
+			$this->_exit_function( true );
 
 			$exited = true;
 		}
