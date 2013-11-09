@@ -1,0 +1,16 @@
+#!/usr/bin/env php
+<?php
+
+if ( ($key = array_search( '-c', $argv )) ) {
+
+	unset( $argv[ $key ] );
+	$argv = array_values( $argv );
+
+	require_once dirname( __DIR__ ) . '/ignores-cache-generator.php';
+	WP_L10n_Specific_Ignores_Generator::cli();
+
+} else {
+
+	require_once dirname( __DIR__ ) . '/wp-l10n-validator.php';
+	WP_L10n_Validator::cli();
+}

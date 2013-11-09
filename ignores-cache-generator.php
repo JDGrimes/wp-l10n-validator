@@ -122,61 +122,11 @@ class WP_L10n_Specific_Ignores_Generator extends WP_L10n_Validator {
 	 *
 	 * @return WP_L10n_Specific_Ignores_Generator|bool The parser instance or false.
 	 */
-	public static function cli( $file = __FILE__ ) {
+	public static function cli() {
 
-		$parser = parent::cli( $file );
-
-		if ( ! $parser ) // We aren't running from the CLI.
-			return false;
-
-		$parser->write_cache( self::$cache_file );
-
+		$parser = parent::cli();
+		$parser->write_cache();
 		return $parser;
 	}
 
-	/**
-	 * Parse the CLI args.
-	 *
-	 * If the CLI call does not have all of the expected arguments, the usage will
-	 * be displayed by calling static::cli_usage().
-	 *
-	 * @since 0.1.0
-	 *
-	 * @param array $args The CLI args ($argv).
-	 *
-	 * @return array {
-	 *         The parsed args.
-	 *
-	 *         @type string $basedir    The base directory of the project to parse.
-	 *         @type string $textdomain The expected textdomain.
-	 *         @type string $config     The configuration to load. Default is 'wordpress'.
-	 */
-	public static function parse_cli_args( $args ) {
-
-		$parsed_args = parent::parse_cli_args( $args );
-
-		if ( isset( $args[4] ) )
-			self::$cache_file = $args[4];
-
-		return $parsed_args;
-	}
-
-	/**
-	 * Display CLI usage message.
-	 *
-	 * @since 0.1.0
-	 */
-	public static function cli_usage() {
-
-		fwrite(
-			STDERR,
-			"Usage: php ignores-cache-generator.php TEXTDOMAIN [DIRECTORY [CONFIG [CACHE_FILE]]]\n\n"
-			. "Generate a cache of specific non-gettexted string occurances from all .php files in DIRECTORY\n"
-			. "using the configuration from CONFIG, where CONFIG is one of the directories in /config.\n"
-			. "The resulting list of string occurrances to ignore will be written to the CAHCE_FILE.\n"
-		);
-		exit( 1 );
-	}
-}
-
-WP_L10n_Specific_Ignores_Generator::cli();
+} // class WP_L10n_Specific_Ignores_Generator

@@ -225,6 +225,15 @@ class WP_L10n_Validator {
 	 */
 	protected static $config_callbacks;
 
+	/**
+	 * Basic configuration from the JSON config file.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @type array $config
+	 */
+	protected static $config = array();
+
 	//
 	// Public Vars.
 	//
@@ -315,18 +324,17 @@ class WP_L10n_Validator {
 	 */
 	public $save_cache = true;
 
-	//
-	// Protected Static Method.
-	//
-
 	/**
-	 * Basic configuration from the JSON config file.
+	 * Whether to run the files one by one.
+	 *
+	 * This is useful for large projects, especially for the first run. When there is
+	 * a cache, it will run until it reaches the first changed file, then stop.
 	 *
 	 * @since 0.1.0
 	 *
-	 * @type array $cache
+	 * @type bool $one_by_one
 	 */
-	protected static $config = array();
+	public $one_by_one = false;
 
 	//
 	// Public Methods.
@@ -348,6 +356,16 @@ class WP_L10n_Validator {
 		$this->textdomains = array(
 			$textdomain => true,
 		);
+
+		if ( isset( self::$config['cache'] ) )
+			$this->cache_file = self::resolve_path( self::$config['cache'] );
+
+		if ( isset( self::$config['ignores-cache'] ) ) {
+			$ignores = self::load_json_file( self::resolve_path( self::$config['ignores-cache'] ) );
+
+			if ( $ignores )
+				$this->ignored_string_occurences += $ignores;
+		}
 
 		foreach ( (array) self::$config_callbacks as $callback ) {
 
@@ -374,21 +392,6 @@ class WP_L10n_Validator {
 
 			include __DIR__ . "/config/{$type}/{$part}.php";
 		}
-	}
-
-	/**
-	 * Load a cached file of specific string occurrances.
-	 *
-	 * @since 0.1.0
-	 *
-	 * @param string $file The full path to the cache file.
-	 */
-	public function load_specific_ignores( $file ) {
-
-		$ignores = self::load_json_file( $file );
-
-		if ( $ignores )
-			$this->ignored_string_occurences += $ignores;
 	}
 
 	/**
@@ -1404,6 +1407,33 @@ class WP_L10n_Validator {
 	//
 
 	/**
+	 * Make sure a path is absolute.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @param string $path     The path to make absolute.
+	 * @param string $relative The path that $path is relative to if it is relative.
+	 *                         If empty, the current working directory is used.
+	 *
+	 * @return string An absolute path.
+	 */
+	protected static function resolve_path( $path, $relative = false ) {
+
+		if ( strpos( $path, './' ) === 0 ) {
+
+			if ( ! $relative && ! ( $relative = getcwd() ) ) {
+
+				static::error( 'Unable to get current working directory.' );
+				exit;
+			}
+
+			$path = $relative . ltrim( $path, '.' );
+		}
+
+		return $path;
+	}
+
+	/**
 	 * Load a JSON file.
 	 *
 	 * @since 0.1.0
@@ -1469,15 +1499,9 @@ class WP_L10n_Validator {
 	 *
 	 * @param string $file The file that should have been called from the CLI.
 	 *
-	 * @return WP_L10n_Validator|bool The parser instance or false.
+	 * @return WP_L10n_Validator The parser instance.
 	 */
-	public static function cli( $file = __FILE__ ) {
-
-		// Check if we are running from the CLI.
-		$included_files = get_included_files();
-
-		if ( $included_files[0] != $file )
-			return false;
+	public static function cli() {
 
 		error_reporting( E_ALL );
 
@@ -1485,16 +1509,8 @@ class WP_L10n_Validator {
 		self::load_json_config();
 
 		// Attempt to locate a config file for this project.
-		$config_file = static::locate_config_file();
-
-		if ( $config_file ) {
-
-			include $config_file;
-
-		} else {
-
-			fwrite( STDERR, "No config file found, running with default configuration.\n" );
-		}
+		if ( ! empty( self::$config['bootstrap'] ) )
+			include self::resolve_path( self::$config['bootstrap'] );
 
 		// If the config file hasn't overridden the parser, use the default.
 		if ( ! isset( $parser ) || ! $parser instanceof WP_L10n_Validator ) {
@@ -1516,6 +1532,11 @@ class WP_L10n_Validator {
 				default:
 					$parser->load_config( 'default', array( 'ignores' ) );
 			}
+
+			$parser->one_by_one = $args['one-by-one'];
+			$parser->add_ignored_functions( self::$config['ignored-functions'] );
+			$parser->add_ignored_strings( self::$config['ignored-strings'] );
+			$parser->add_ignored_atts( self::$config['ignored-atts'] );
 		}
 
 		// Parse the project.
@@ -1549,28 +1570,6 @@ class WP_L10n_Validator {
 	}
 
 	/**
-	 * Locate a config file from the CLI.
-	 *
-	 * We don't check that the file actually exists.
-	 *
-	 * @since 0.1.0
-	 *
-	 * @return string|bool The path to the config file, or false.
-	 */
-	public static function locate_config_file() {
-
-		$config_file = getenv( 'WP_L10N_VALIDATOR_CONFIG' );
-
-		if ( empty( self::$config['bootstrap'] ) )
-			return $config_file;
-
-		if ( strpos( self::$config['bootstrap'], './' ) === 0 )
-			return getcwd() . ltrim( self::$config['bootstrap'], '.' );
-
-		return self::$config['bootstrap'];
-	}
-
-	/**
 	 * Parse the CLI args.
 	 *
 	 * If the CLI call does not have all of the expected arguments, the usage will
@@ -1591,12 +1590,37 @@ class WP_L10n_Validator {
 
 		$parsed_args = array_merge(
 			array(
-				'basedir'    => '',
-				'textdomain' => '',
-				'config'     => 'wordpress',
+				'basedir'           => '',
+				'textdomain'        => '',
+				'config'            => 'wordpress',
+				'one-by-one'        => false,
+				'ignored-functions' => array(),
+				'ignored-strings'   => array(),
+				'ignored-atts'      => array(),
 			)
 			, self::$config
 		);
+
+		if ( empty( $parsed_args['basedir'] ) ) {
+
+			$parsed_args['basedir'] = getcwd();
+
+			if ( ! $parsed_args['basedir'] ) {
+				self::error( 'Failed: unable to get current working directory.' );
+				exit( 1 );
+			}
+
+		} else {
+
+			$parsed_args['basedir'] = self::resolve_path( $parsed_args['basedir'] );
+		}
+
+		if ( ( $key = array_search( '-1', $args ) ) ) {
+
+			unset( $args[ $key ] );
+			$args = array_values( $args );
+			$parsed_args['one_by_one'] = true;
+		}
 
 		if ( ! isset( $args[1] ) ) {
 
@@ -1608,31 +1632,8 @@ class WP_L10n_Validator {
 			$parsed_args['textdomain'] = $args[1];
 		}
 
-		if ( ! isset( $args[2] ) ) {
-
-		 	if ( empty( $parsed_args['basedir'] ) ) {
-
-		 		if ( ! ( $working_dir = getcwd() ) )
-					static::cli_usage();
-				else
-					$parsed_args['basedir'] = $working_dir;
-			}
-
-		} else {
-
-			$parsed_args['basedir'] = $args[2];
-		}
-
-		if ( strpos( $parsed_args['basedir'], './' ) === 0 ) {
-
-			if ( ! ( $working_dir = getcwd() ) )
-				static::error( 'Failed to get working directory, please use an absolute path.' );
-
-			$parsed_args['basedir'] = $working_dir . ltrim( $parsed_args['basedir'], '.' );
-		}
-
-		if ( isset( $args[3] ) )
-			$parsed_args['config'] = $args[3];
+		if ( isset( $args[1] ) )
+			$parsed_args['config'] = $args[2];
 
 		return $parsed_args;
 	}
@@ -1646,13 +1647,17 @@ class WP_L10n_Validator {
 
 		fwrite(
 			STDERR,
-			"Usage: php wp-l10n-validator.php TEXTDOMAIN [DIRECTORY [CONFIG]]\n\n"
-			. "Validate all .php files in DIRECTORY for proper gettexting with TEXTDOMAIN\n"
-			. "using the configuration from CONFIG, where CONFIG is one of the directories in /config.\n"
+			"\nUsage: wp-l10n-validator -[1c] TEXTDOMAIN [CONFIG]\n\n"
+			. "Validate all .php files in the current directory for proper gettexting.\n"
+			. "\nArguments:\n"
+			. "\tTEXTDOMAIN - The textdomain used in the project.\n"
+			. "\tCONFIG - Configuration to use. Corressponds to one of the directories\n"
+			. "\t\t in /config (wordpress by default).\n"
+			. "\nFlags:\n"
+			. "\t1 - Parse only one file at a time.\n"
+			. "\tc - Generate a specific ignores cache.\n"
 		);
 		exit( 1 );
 	}
 
 } // class WP_L10n_Validator
-
-WP_L10n_Validator::cli();
