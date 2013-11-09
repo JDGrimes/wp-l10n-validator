@@ -418,6 +418,9 @@ class WP_L10n_Validator {
 	public function save_cache() {
 
 		self::save_json_file( $this->cache_file, $this->cache );
+
+		if ( isset( self::$config['ignores-cache'] ) )
+			self::save_json_file( $this->resolve_path( self::$config['ignores-cache'] ) );
 	}
 
 	/**
@@ -1252,13 +1255,22 @@ class WP_L10n_Validator {
 					$line + $this->ignores_tolerance > $this->line_number
 					&& $line - $this->ignores_tolerance < $this->line_number
 					&& $this->cur_func == $cur_func
-				)
+				) {
+
+					if ( $line != $this->line_number ) {
+
+						$this->ignored_string_occurences[ $text ][ $this->line_number ] = $cur_func;
+						unset( $this->ignored_string_occurences[ $text ][ $line ] );
+					}
+
 					return false;
+				}
 			}
 		}
 
 		return $text;
-	}
+
+	} // private function prepare_non_gettext()
 
 	//
 	// Protected Methods.
