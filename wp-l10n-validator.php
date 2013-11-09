@@ -1294,7 +1294,7 @@ class WP_L10n_Validator {
 			$func_text = " {$this->cur_func['name']}( " . ( $this->cur_func['arg_count'] + 1 ) . " )";
 		}
 
-		error_log( "{$this->filename}#{$this->line_number}{$func_text}: Non gettexted string '{$text}'" );
+		$this->error( "{$this->filename}#{$this->line_number}{$func_text}: Non gettexted string '{$text}'" );
 	}
 
 	/**
@@ -1304,7 +1304,7 @@ class WP_L10n_Validator {
 	 */
 	protected function report_invalid_l10n_arg() {
 
-		error_log( "{$this->filename}#{$this->line_number} {$this->cur_func['name']}( " . ( $this->cur_func['arg_count'] + 1 ) . " ): Invalid l10n function argument." );
+		$this->error( "{$this->filename}#{$this->line_number} {$this->cur_func['name']}( " . ( $this->cur_func['arg_count'] + 1 ) . " ): Invalid l10n function argument." );
 	}
 
 	/**
@@ -1316,7 +1316,7 @@ class WP_L10n_Validator {
 	 */
 	protected function report_unexpected_textdomain( $text ) {
 
-		error_log( "{$this->filename}#{$this->line_number} {$this->cur_func['name']}( " . ( $this->cur_func['arg_count'] + 1 ) . " ): Unexpected textdomain: '{$text}'." );
+		$this->error( "{$this->filename}#{$this->line_number} {$this->cur_func['name']}( " . ( $this->cur_func['arg_count'] + 1 ) . " ): Unexpected textdomain: '{$text}'." );
 	}
 
 	/**
@@ -1328,7 +1328,7 @@ class WP_L10n_Validator {
 	 */
 	protected function report_required_args( $required_args ) {
 
-		error_log( "{$this->filename}#{$this->line_number}: {$this->cur_func['name']}() requires {$required_args} arguments, only " . ( $this->cur_func['arg_count'] + 1 ) . " given." );
+		$this->error( "{$this->filename}#{$this->line_number}: {$this->cur_func['name']}() requires {$required_args} arguments, only " . ( $this->cur_func['arg_count'] + 1 ) . " given." );
 	}
 
 	/**
@@ -1340,7 +1340,7 @@ class WP_L10n_Validator {
 	 */
 	protected function report_deprecated_l10n_function( $function ) {
 
-		error_log( "{$this->filename}#{$this->line_number}: {$this->cur_func['name']}() is deprecated! Please use its replacement instead." );
+		$this->error( "{$this->filename}#{$this->line_number}: {$this->cur_func['name']}() is deprecated! Please use its replacement instead." );
 	}
 
 	/**
@@ -1353,16 +1353,49 @@ class WP_L10n_Validator {
 	protected function debug_callback() {
 
 		$func_text = '';
+		$func_stack = '';
 
 		if ( $this->cur_func ) {
 
 			$func_text = " {$this->cur_func['name']}( " . ( $this->cur_func['arg_count'] + 1 ) . " )";
+
+			if ( count( $this->func_stack ) ) {
+
+				$func_stack = "\n\t Function call stack:";
+				$i = 0;
+
+				foreach ( $this->func_stack as $func ) {
+
+					$i++;
+					$func_stack = "\n\t\t {$i}. {$func['name']}( " . ( $func['arg_count'] + 1 ) . " )";
+				}
+			}
 		}
 
-		error_log(
-			"{$this->filename}#{$this->line_number}{$func_text}: debug token found - In include? "
-			. ( $this->in_include ? 'yes' : 'no' ) . ". In switch case? ."
-			. ( $this->in_switch_case ? 'yes' : 'no' )
+		$in_class = '';
+
+		if ( $this->in_class ) {
+
+			$in_class .= "\n\t In class: ";
+
+			if ( isset( $this->in_class['self'] ) ) {
+
+				$in_class .= $this->in_class['self'];
+				$in_class .= ( isset( $this->in_class['parent'] ) ) ? '(parent: ' . $this->in_class['parent'] . ')' : '';
+
+			} else {
+
+				$in_class .= '-entering-';
+			}
+		}
+
+		$this->error(
+			"{$this->filename}#{$this->line_number}{$func_text}: debug token found."
+			. "\n\t In include: " . ( $this->in_include ? 'yes' : 'no' )
+			. "\n\t In switch case: " . ( $this->in_switch_case ? 'yes' : 'no' )
+			. "\n\t In new class: " . ( $this->in_new_class ? 'yes' : 'no' )
+			. $in_class
+			. $func_stack
 		);
 	}
 
