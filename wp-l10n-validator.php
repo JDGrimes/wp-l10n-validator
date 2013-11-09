@@ -332,10 +332,6 @@ class WP_L10n_Validator {
 
 		$this->basedir = realpath( $basedir );
 
-		// Restore trailing slash, if present in original.
-		if ( trim( $basedir, '/' ) != $basedir )
-			$this->basedir .= '/';
-
 		// Values currently ignored.
 		$this->textdomains = array(
 			$textdomain => true,

@@ -21,7 +21,7 @@ class WP_L10n_Validator_L10n_Functions_Recognized_Test extends WP_L10n_Validator
 	 *
 	 * @type string $file
 	 */
-	protected static $file = 'l10n-functions.php';
+	protected static $file = '/l10n-functions.php';
 
 	/**
 	 * Test that the parser found the invalid textdomains.

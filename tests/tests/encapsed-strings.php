@@ -21,7 +21,7 @@ class WP_L10n_Validator_Untranslated_Encapsed_String_Test extends WP_L10n_Valida
 	 *
 	 * @type string $file
 	 */
-	protected static $file = 'encapsed-strings.php';
+	protected static $file = '/encapsed-strings.php';
 
 	/**
 	 * Test that the parser found the non-gettexted encapsed strings.

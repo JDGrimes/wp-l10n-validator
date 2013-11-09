@@ -21,7 +21,7 @@ class WP_L10n_Validator_Textdomain_Test extends WP_L10n_Validator_UnitTestCase {
 	 *
 	 * @type string $file
 	 */
-	protected static $file = 'bad-textdomains.php';
+	protected static $file = '/bad-textdomains.php';
 
 	/**
 	 * Test that the parser found the invalid textdomains.

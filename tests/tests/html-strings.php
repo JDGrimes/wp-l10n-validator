@@ -21,7 +21,7 @@ class WP_L10n_Validator_Untranslated_HTML_String_Test extends WP_L10n_Validator_
 	 *
 	 * @type string $file
 	 */
-	protected static $file = 'html-strings.php';
+	protected static $file = '/html-strings.php';
 
 	/**
 	 * Test that the parser found the non-gettexted HTML strings.

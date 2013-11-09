@@ -21,7 +21,7 @@ class WP_L10n_Validator_L10n_Bad_L10n_Args_Test extends WP_L10n_Validator_UnitTe
 	 *
 	 * @type string $file
 	 */
-	protected static $file = 'bad-l10n-func-args.php';
+	protected static $file = '/bad-l10n-func-args.php';
 
 	/**
 	 * Test that the parser found the invalid l10n function arguments.
