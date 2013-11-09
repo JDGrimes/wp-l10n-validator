@@ -13,10 +13,14 @@ $parser->add_ignored_functions(
 		'_deprecated_function'  => true,
 		'add_action'            => true,
 		'add_filter'            => true,
+		'add_menu_page'         => array( 3, 4, 5 ),
 		'add_option'            => true,
 		'add_query_arg'         => true,
+		'add_screen_option'     => array( 1 ),
 		'add_shortcode'         => true,
+		'add_submenu_page'      => array( 1, 4, 5, 6 ),
 		'admin_url'             => true,
+		'apply_filters'         => array( 1 ),
 		'check_admin_referer'   => true,
 		'check_ajax_referer'    => true,
 		'current_time'          => true,
@@ -26,6 +30,7 @@ $parser->add_ignored_functions(
 		'delete_option'         => true,
 		'delete_site_transient' => true,
 		'delete_transient'      => true,
+		'do_action'             => array( 1 ),
 		'get_bloginfo'          => true,
 		'get_file_data'         => true,
 		'get_option'            => true,
@@ -35,6 +40,7 @@ $parser->add_ignored_functions(
 		'get_transient'         => true,
 		'get_user_meta'         => true,
 		'get_user_option'       => true,
+		'get_user_setting'      => array( 1 ),
 		'network_admin_url'     => true,
 		'plugins_url'           => true,
 		'register_activation_hook' => true,
@@ -46,13 +52,18 @@ $parser->add_ignored_functions(
 		'set_site_transient'    => true,
 		'set_transient'         => true,
 		'set_url_scheme'        => true,
+		'set_user_setting'      => array( 1 ),
+		'shortcode_atts'        => array( 3 ),
+		'submit_button'         => array( 2, 3, 4 ),
 		'update_comment_meta'   => true,
 		'update_option'         => true,
 		'update_site_option'    => true,
+		'update_user_meta'      => array( 1, 2 ),
 		'wp_cache_delete'       => true,
 		'wp_create_nonce'       => true,
 		'wp_enqueue_script'     => true,
 		'wp_enqueue_style'      => true,
+		'wp_localize_script'    => array( 1, 2 ),
 		'wp_nonce_field'        => true,
 		'wp_nonce_url'          => true,
 		'wp_register_script'    => true,
@@ -66,25 +77,7 @@ $parser->add_ignored_functions(
 		// New instance calls.
 		'new File_Upload_Upgrader' => true,
 		'new WP_Date_Query'        => true,
-	)
-);
-
-$parser->add_ignored_args(
-	array(
-		// Functions.
-		'add_menu_page'      => array(       3, 4, 5 ),
-		'add_screen_option'  => array( 1 ),
-		'add_submenu_page'   => array( 1,       4, 5, 6 ),
-		'apply_filters'      => array( 1 ),
-		'do_action'          => array( 1 ),
-		'get_user_setting'   => array( 1 ),
-		'set_user_setting'   => array( 1 ),
-		'shortcode_atts'     => array(       3 ),
-		'submit_button'      => array(    2, 3, 4 ),
-		'update_user_meta'   => array( 1, 2 ),
-		'wp_localize_script' => array( 1, 2 ),
-		// New instances.
-		'new WP_Error'       => array( 1 ),
+		'new WP_Error'             => array( 1 ),
 	)
 );
 

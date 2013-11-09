@@ -230,15 +230,6 @@ class WP_L10n_Validator {
 	public $ignored_functions = array();
 
 	/**
-	 * Function arguments to ignore.
-	 *
-	 * @since 0.1.0
-	 *
-	 * @type array $ignored_function_args
-	 */
-	public $ignored_function_args = array();
-
-	/**
 	 * HTML attributes whose values to ignore.
 	 *
 	 * @since 0.1.0
@@ -474,18 +465,6 @@ class WP_L10n_Validator {
 	public function remove_ignored_functions( array $functions ) {
 
 		$this->ignored_functions = array_diff( $this->ignored_functions, array_flip( $functions ) );
-	}
-
-	/**
-	 * Add to the list of ignored arguments.
-	 *
-	 * @since 0.1.0
-	 *
-	 * @param array $args An array of arguments indexed by function name.
-	 */
-	public function add_ignored_args( array $args ) {
-
-		$this->ignored_function_args += $args;
 	}
 
 	/**
@@ -752,7 +731,7 @@ class WP_L10n_Validator {
 							if ( 'deprecated' == $this->l10n_functions[ $full_function ]['status'] )
 								$this->report_deprecated_l10n_function( $full_function );
 
-						} elseif ( isset( $this->ignored_functions[ $full_function ] ) ) {
+						} elseif ( isset( $this->ignored_functions[ $full_function ] ) && true === $this->ignored_functions[ $full_function ] ) {
 
 							// We are entering a function that we want to ignore.
 							$this->_enter_function( $full_function, 'ignored' );
@@ -816,9 +795,9 @@ class WP_L10n_Validator {
 								||
 									$this->cur_func['type'] != 'ignored'
 								&& (
-										! isset( $this->ignored_function_args[ $this->cur_func['name'] ] )
+										! isset( $this->ignored_functions[ $this->cur_func['name'] ][0] )
 									||
-										! in_array( $this->cur_func['arg_count'] + 1, $this->ignored_function_args[ $this->cur_func['name'] ] )
+										! in_array( $this->cur_func['arg_count'] + 1, $this->ignored_functions[ $this->cur_func['name'] ] )
 								)
 							) && ! (
 									 $brackets
@@ -1036,6 +1015,8 @@ class WP_L10n_Validator {
 						'ignored' == $this->cur_func['type']
 					&&
 						! empty( $this->ignored_functions[ $this->cur_func['name'] ] )
+					&&
+						true === $this->ignored_functions[ $this->cur_func['name'] ]
 				) {
 					$type = 'ignored';
 				}

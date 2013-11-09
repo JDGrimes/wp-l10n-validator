@@ -35,21 +35,16 @@ $parser->add_ignored_functions(
 		'array_filter' => true,
 		'array_map'    => true,
 		'compact'      => true,
+		'define'       => array( 1 ),
 		'defined'      => true,
 		'explode'      => true,
 		'implode'      => true,
 		'in_array'     => true,
 		'ltrim'        => true,
 		'preg_replace' => true,
+		'sprintf'      => array( 2, 3, 4 ), // More args could be added
 		'str_replace'  => true,
 		'usort'        => true,
-	)
-);
-
-$parser->add_ignored_args(
-	array(
-		'define'  => array( 1 ),
-		'sprintf' => array(    2, 3, 4 ), // More could be added here
 	)
 );
 
