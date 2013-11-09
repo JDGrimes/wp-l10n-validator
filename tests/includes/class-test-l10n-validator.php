@@ -41,6 +41,15 @@ class Test_L10n_Validator extends WP_L10n_Validator {
 		'deprecated_function'   => array(),
 	);
 
+	/**
+	 * The debug callback states.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @type array $debugs
+	 */
+	private $debugs = array();
+
 	//
 	// Public Methods.
 	//
@@ -55,6 +64,18 @@ class Test_L10n_Validator extends WP_L10n_Validator {
 	public function get_results() {
 
 		return $this->results;
+	}
+
+	/**
+	 * Retrieve the debugs.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @return array The parser states for any debug calls.
+	 */
+	public function get_debugs() {
+
+		return $this->debugs;
 	}
 
 	//
@@ -154,6 +175,6 @@ class Test_L10n_Validator extends WP_L10n_Validator {
 	 */
 	protected function debug_callback() {
 
-		var_log( $this->get_parser_state() );
+		$this->debugs[] = $this->get_parser_state();
 	}
 }

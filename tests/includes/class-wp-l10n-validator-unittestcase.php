@@ -56,6 +56,15 @@ class WP_L10n_Validator_UnitTestCase extends PHPUnit_Framework_TestCase {
 	 */
 	protected static $file;
 
+	/**
+	 * The parser statuses returned for any debug tokens found.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @type array $debugs
+	 */
+	protected static $debugs;
+
 	//
 	// Public Methods.
 	//
@@ -82,6 +91,7 @@ class WP_L10n_Validator_UnitTestCase extends PHPUnit_Framework_TestCase {
 
 		self::$errors = $parser->get_results();
 		self::$expected_errors = array();
+		self::$debugs = $parser->get_debugs();
 	}
 
 	/**
@@ -94,6 +104,9 @@ class WP_L10n_Validator_UnitTestCase extends PHPUnit_Framework_TestCase {
 	public static function tearDownAfterClass() {
 
 		self::check_for_unexpected_errors();
+
+		if ( ! empty( self::$debugs ) )
+			var_dump( self::$debugs );
 	}
 
 	/**

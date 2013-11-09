@@ -168,6 +168,18 @@ class WP_L10n_Validator {
 	protected $in_new_class;
 
 	/**
+	 * The name of the current class (and possibly parent).
+	 *
+	 * @since 0.1.0
+	 *
+	 * @type array {
+	 *       @type string $self   The name of the class.
+	 *       @type string $parent The name the parent of the class (if one).
+	 * }
+	 */
+	protected $in_class;
+
+	/**
 	 * The function call stack.
 	 *
 	 * This keeps track of the stack when a function is called within a call to
@@ -581,6 +593,7 @@ class WP_L10n_Validator {
 			'in_include'     => $this->in_include,
 			'in_switch_case' => $this->in_switch_case,
 			'in_new_class'   => $this->in_new_class,
+			'in_class'       => $this->in_class,
 		);
 	}
 
@@ -670,11 +683,15 @@ class WP_L10n_Validator {
 		$this->in_include     = false;
 		$this->in_switch_case = false;
 		$this->in_new_class   = false;
+		$this->in_class       = false;
 		$this->line_number    = 1;
 		$this->func_stack     = array();
 
-		// The number of open brackets ([).
+		// The number of open brackets ([) and braces ({).
 		$brackets = 0;
+		$braces   = 0;
+
+		$in_extends = false;
 
 		$tokens = token_get_all( $content );
 
@@ -700,7 +717,27 @@ class WP_L10n_Validator {
 
 								case '::':
 								case '->':
-									$full_function = $tokens[ $index - 2 ][1] . $tokens[ $index - 1 ][1] . $full_function;
+									if ( isset( $this->in_class['self'] ) ) {
+
+										switch ( $tokens[ $index - 2 ][ 1 ] ) {
+
+											case 'self':
+											case '$this':
+											case 'static':
+												$full_function = $this->in_class['self'] . '::' . $full_function;
+											break;
+
+											case 'parent':
+												if ( isset( $this->in_class['parent'] ) )
+													$full_function = $this->in_class['parent'] . '::' . $full_function;
+											break;
+										}
+
+									} else {
+
+										$full_function = $tokens[ $index - 2 ][1] . $tokens[ $index - 1 ][1] . $full_function;
+									}
+
 									$index -= 2;
 								break;
 
@@ -710,8 +747,20 @@ class WP_L10n_Validator {
 
 						if ( $this->in_new_class ) {
 
-							$full_function = 'new ' . $full_function;
+							$full_function .= '::__construct';
 							$this->in_new_class = false;
+
+						} elseif ( true === $this->in_class ) {
+
+							$this->in_class = array( 'self' => $full_function );
+							break;
+
+						} elseif ( $in_extends ) {
+
+							$this->in_class['parent'] = $full_function;
+							$in_extends = false;
+							break;
+
 						}
 
 						if ( $this->debug_marker == $full_function ) {
@@ -831,6 +880,14 @@ class WP_L10n_Validator {
 						$this->in_new_class = true;
 					break;
 
+					case T_CLASS:
+						$this->in_class = true;
+					break;
+
+					case T_EXTENDS:
+						$in_extends = true;
+					break;
+
 					case T_WHITESPACE:
 					case T_COMMENT:
 					case T_DOC_COMMENT: break;
@@ -919,6 +976,17 @@ class WP_L10n_Validator {
 
 					case ']':
 						$brackets--;
+					break;
+
+					// Keep track of curly braces when we are in a class declaration.
+					case '{':
+						if ( $this->in_class )
+							$braces++;
+					break;
+
+					case '}':
+						if ( $this->in_class && 0 == --$braces )
+							$this->in_class = false;
 					break;
 
 					case ';':
