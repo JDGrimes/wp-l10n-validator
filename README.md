@@ -49,7 +49,7 @@ $ wp-l10n-validator my-plugin
 ```
 
 You can also add a `wp-l10n-validator.json` file in the main directory of your
-project, which specifies the basic configuration for your project ([see below](#Configuration)).
+project, which specifies the basic configuration for your project ([see below](#configuration)).
 With this file in place you can run the parser without any arguments.
 
 Configuration
@@ -75,7 +75,7 @@ These are the options that you can specify in the the JSON config file:
 
  * `textdomain` - Your project's texdomain.
  * `basedir` - The main directory of your project (if different from the current directory).
- * `config` - The configuration to use ([see CLI arguments above](#Usage)).
+ * `config` - The configuration to use ([see CLI arguments above](#usage)).
  * `cache` - The file to store the cache in. The default is `wp-l10n-validator-cache.json`.
  * `ignores-cache` - The file to store the specific ignores cache in. The default is `wp-l10n-validator-ignores.json`.
  * `ignored-functions` - An associative array of functions to ignore. The value can be
