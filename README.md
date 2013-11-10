@@ -96,6 +96,8 @@ These are the options that you can specify in the the JSON config file:
    the output method by overriding the `report_*` functions, for example. Just assign
    and instance of your class to the `$parser` variable: `$parser = new My_L10n_Validator`.
 
+See [example-config.json](example-config.json) for an example.
+
 Notes
 -----
 
