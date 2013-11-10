@@ -179,7 +179,7 @@ class WP_L10n_Validator_UnitTestCase extends PHPUnit_Framework_TestCase {
 
 		self::mark_error_expected( $error, $type );
 
-		self::assertThat( $error, self::wasThrownByParser( $type ), $message );
+		self::assertThat( $error, self::wasCaughtByParser( $type ), $message );
 	}
 
 	/**
@@ -249,26 +249,12 @@ class WP_L10n_Validator_UnitTestCase extends PHPUnit_Framework_TestCase {
 
 		self::mark_error_expected( $error, 'invalid_l10n_arg' );
 
-		self::assertThat( $error, self::wasThrownByParser( 'invalid_l10n_arg', self::$errors ), $message );
+		self::assertThat( $error, self::wasCaughtByParser( 'invalid_l10n_arg' ), $message );
 	}
 
 	//
 	// - Conditions.
 	//
-
-	/**
-	 * Check that an error was thrown by the parser.
-	 *
-	 * @since 0.1.0
-	 *
-	 * @param string $type The type of error to check for.
-	 *
-	 * @return WP_L10n_Validator_PHPUnit_Constraint_WasThrownByParser
-	 */
-	public static function wasThrownByParser( $type ) {
-
-		return new WP_L10n_Validator_PHPUnit_Constraint_WasThrownByParser( $type, self::$errors );
-	}
 
 	/**
 	 * Check that an error was caught by the parser.
@@ -281,87 +267,12 @@ class WP_L10n_Validator_UnitTestCase extends PHPUnit_Framework_TestCase {
 	 *
 	 * @return WP_L10n_Validator_PHPUnit_Constraint_WasCaughtByParser
 	 */
-	public static function wasCaughtByParser( $type, $data, $to_string ) {
+	public static function wasCaughtByParser( $type, $data = false, $to_string = 'was caught by the parser' ) {
 
 		return new WP_L10n_Validator_PHPUnit_Constraint_WasCaughtByParser( $type, $data, $to_string, self::$errors );
 	}
 
 } // class WP_L10n_Validator_UnitTestCase
-
-/**
- * Error was thrown by parser constraint.
- *
- * @since 0.1.0
- */
-class WP_L10n_Validator_PHPUnit_Constraint_WasThrownByParser extends PHPUnit_Framework_Constraint {
-
-	//
-	// Private Vars.
-	//
-
-	/**
-	 * The type of error to check for.
-	 *
-	 * @since 0.1.0
-	 *
-	 * @type string $type
-	 */
-	private $type;
-
-	/**
-	 * The errors that the validator threw.
-	 *
-	 * @since 0.1.0
-	 *
-	 * @type array $errors
-	 */
-	private $errors;
-
-	//
-	// Public Methods.
-	//
-
-	/**
-	 * Construct the class with the error type and found errors.
-	 *
-	 * @since 0.1.0
-	 *
-	 * @param string $type   The type of error that we'll check for.
-	 * @param array  $errors The errors that the parser returned.
-	 */
-	public function __construct( $type, $errors ) {
-
-		$this->type = $type;
-		$this->errors = $errors;
-	}
-
-	/**
-	 * Checks if the $error was thrown by the parser.
-	 *
-	 * @since 0.1.0
-	 *
-	 * @param array $error The error that the parser should have thrown.
-	 *
-	 * @return bool Whether the error was thrown.
-	 */
-	public function matches( $error ) {
-
-		return ( isset( $this->errors[ $this->type ] ) && array_search( $error, $this->errors[ $this->type ] ) !== false );
-	}
-
-	/**
-	 * Returns a string representation of the constraint.
-	 *
-	 * @since 0.1.0
-	 *
-	 * @return string
-	 */
-	public function toString() {
-
-		return 'was caught by the parser';
-	}
-
-} // class WP_L10n_Validator_PHPUnit_Constraint_WasThrownByParser
 
 /**
  * Error was caught by parser constraint.
@@ -445,16 +356,23 @@ class WP_L10n_Validator_PHPUnit_Constraint_WasCaughtByParser extends PHPUnit_Fra
 		if ( ! isset( $this->errors[ $this->type ] ) )
 			return false;
 
-		foreach ( $this->errors[ $this->type ] as $error_data ) {
+		if ( $this->data ) {
 
-			if ( $error_data[ $this->data ] == $data ) {
+			foreach ( $this->errors[ $this->type ] as $error_data ) {
 
-				WP_L10n_Validator_UnitTestCase::mark_error_expected( $error_data, $this->type );
-				return true;
+				if ( $error_data[ $this->data ] == $data ) {
+
+					WP_L10n_Validator_UnitTestCase::mark_error_expected( $error_data, $this->type );
+					return true;
+				}
 			}
-		}
 
-		return false;
+			return false;
+
+		} else {
+
+			return ( array_search( $data, $this->errors[ $this->type ] ) !== false );
+		}
 	}
 
 	/**
