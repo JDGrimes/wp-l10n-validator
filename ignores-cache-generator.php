@@ -45,7 +45,7 @@ class WP_L10n_Specific_Ignores_Generator extends WP_L10n_Validator {
 	 *
 	 * @return bool Whether the cache was written successfully.
 	 */
-	public function write_cache( $file ) {
+	public function write_cache( $file = '' ) {
 
 		if ( empty( $file ) ) {
 
