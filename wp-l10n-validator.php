@@ -1479,7 +1479,9 @@ class WP_L10n_Validator {
 
 			$args = static::parse_cli_args( $argv );
 
-			$parser = static::__construct( $args['basedir'], $args['textdomain'] );
+			$class = get_called_class();
+
+			$parser = new $class( $args['basedir'], $args['textdomain'] );
 
 			switch ( $args['config'] ) {
 
@@ -1591,7 +1593,7 @@ class WP_L10n_Validator {
 			$parsed_args['textdomain'] = $args[1];
 		}
 
-		if ( isset( $args[1] ) )
+		if ( isset( $args[2] ) )
 			$parsed_args['config'] = $args[2];
 
 		return $parsed_args;
