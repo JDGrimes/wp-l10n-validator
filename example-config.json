@@ -11,7 +11,7 @@
 		"my_plugin_do_that":[1, 3, 4],
 		"My_Plugim::do_stuff":true,
 		"$my_plugin->add_foo":true
-	}
+	},
 	"ignored-strings": [
 		"SELECT COUNT(*)",
 		"%placeholder%",
