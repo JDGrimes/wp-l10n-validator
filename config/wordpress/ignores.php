@@ -70,10 +70,13 @@ $parser->add_ignored_functions(
 		'wp_register_style'     => true,
 		'wp_verify_nonce'       => true,
 		// Instance calls.
-		'$wpdb->insert'  => true,
-		'$wpdb->prepare' => true,
-		'$wpdb->query'   => true,
-		'$wpdb->update'  => true,
+		'$wpdb->insert'      => true,
+		'$wpdb->prepare'     => true,
+		'$wpdb->query'       => true,
+		'$wpdb->update'      => true,
+		'$wpdb->get_results' => true,
+		'$wpdb->get_var'     => true,
+		'$wpdb->get_col'     => true,
 		// New instance calls.
 		'new File_Upload_Upgrader' => true,
 		'new WP_Date_Query'        => true,
