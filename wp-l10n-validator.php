@@ -1069,7 +1069,7 @@ class WP_L10n_Validator {
 	 */
 	private function _exit_function( $only_unstarted = false ) {
 
-		if ( ! $this->args_started && 'recursive' != $only_unstarted ) {
+		if ( ! $this->args_started && 'recursive' !== $only_unstarted ) {
 
 			// Move up the stack.
 			$this->_exit_function( 'recursive' );
