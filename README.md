@@ -37,7 +37,14 @@ Arguments:
 
 Flags:
  * `1` - Parse only one file at a time.
- * `c` - Generate a specific ignores cache.
+ * `c` - Generate a specific ignores cache. This is a JSON file that contains a list
+   of specific occurrences of strings to ignore. When you have fixed all of the real
+   problems with your project, there may be left many strings that do not need to be
+   gettexted. Running the command with this flag will cache all of those by file name
+   and line number, so that they will be ignored in future. This is especially useful
+   for strings that you want to ignore only in a specific location. If the line number
+   that a string is on changes, but by less than 5 lines, it will continue to be
+   ignored and the line number will be updated in the cache.
 
 The validator will display any errors it finds.
 
@@ -77,7 +84,8 @@ These are the options that you can specify in the the JSON config file:
  * `basedir` - The main directory of your project (if different from the current directory).
  * `config` - The configuration to use ([see CLI arguments above](#usage)).
  * `cache` - The file to store the cache in. The default is `wp-l10n-validator.cache`.
- * `ignores-cache` - The file to store the specific ignores cache in. The default is `wp-l10n-validator-ignores.cache`.
+ * `ignores-cache` - The file to store the specific ignores cache in. The default is
+   `wp-l10n-validator-ignores.cache`. See the `-c` flag above for more information.
  * `ignored-functions` - An associative array of functions to ignore. The value can be
    an array of specific arguments to be ignored (by argument number), or simply `true`.
    To ignore a class method, add it like this `My_Class::my_method`. This will only
