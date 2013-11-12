@@ -76,8 +76,8 @@ These are the options that you can specify in the the JSON config file:
  * `textdomain` - Your project's texdomain.
  * `basedir` - The main directory of your project (if different from the current directory).
  * `config` - The configuration to use ([see CLI arguments above](#usage)).
- * `cache` - The file to store the cache in. The default is `wp-l10n-validator-cache.json`.
- * `ignores-cache` - The file to store the specific ignores cache in. The default is `wp-l10n-validator-ignores.json`.
+ * `cache` - The file to store the cache in. The default is `wp-l10n-validator.cache`.
+ * `ignores-cache` - The file to store the specific ignores cache in. The default is `wp-l10n-validator-ignores.cache`.
  * `ignored-functions` - An associative array of functions to ignore. The value can be
    an array of specific arguments to be ignored (by argument number), or simply `true`.
    To ignore a class method, add it like this `My_Class::my_method`. This will only

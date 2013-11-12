@@ -195,7 +195,10 @@ class WP_L10n_Validator {
 	 *
 	 * @type array $config
 	 */
-	protected static $config = array();
+	protected static $config = array(
+		'ignores-cache' => 'wp-l10n-validator-ignores.cache',
+		'cache'         => 'wp-l10n-validator.cache',
+	);
 
 	//
 	// Public Vars.
@@ -320,15 +323,12 @@ class WP_L10n_Validator {
 			$textdomain => true,
 		);
 
-		if ( isset( self::$config['cache'] ) )
-			$this->cache_file = self::resolve_path( self::$config['cache'] );
+		$this->cache_file = self::resolve_path( self::$config['cache'] );
 
-		if ( isset( self::$config['ignores-cache'] ) ) {
-			$ignores = self::load_json_file( self::resolve_path( self::$config['ignores-cache'] ) );
+		$ignores = self::load_json_file( self::resolve_path( self::$config['ignores-cache'] ) );
 
-			if ( $ignores )
-				$this->ignored_string_occurences += $ignores;
-		}
+		if ( $ignores )
+			$this->ignored_string_occurences += $ignores;
 
 		foreach ( (array) self::$config_callbacks as $callback ) {
 
@@ -382,8 +382,8 @@ class WP_L10n_Validator {
 
 		self::save_json_file( $this->cache_file, $this->cache );
 
-		if ( isset( self::$config['ignores-cache'] ) )
-			self::save_json_file( $this->resolve_path( self::$config['ignores-cache'] ) );
+		if ( ! empty( $this->ignored_string_occurences ) )
+			self::save_json_file( $this->resolve_path( self::$config['ignores-cache'] ), $this->ignored_string_occurences );
 	}
 
 	/**
@@ -1492,9 +1492,9 @@ class WP_L10n_Validator {
 			}
 
 			$parser->one_by_one = $args['one-by-one'];
-			$parser->add_ignored_functions( self::$config['ignored-functions'] );
-			$parser->add_ignored_strings( self::$config['ignored-strings'] );
-			$parser->add_ignored_atts( self::$config['ignored-atts'] );
+			$parser->add_ignored_functions( $args['ignored-functions'] );
+			$parser->add_ignored_strings( $args['ignored-strings'] );
+			$parser->add_ignored_atts( $args['ignored-atts'] );
 		}
 
 		// Parse the project.
@@ -1523,7 +1523,8 @@ class WP_L10n_Validator {
 		if ( ! $config )
 			return false;
 
-		self::$config = $config;
+		self::$config = array_merge( self::$config, $config );
+
 		return true;
 	}
 

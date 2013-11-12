@@ -52,7 +52,7 @@ class WP_L10n_Specific_Ignores_Generator extends WP_L10n_Validator {
 			if ( ! empty( self::$config['ignores-cache'] ) )
 				$file = self::resolve_path( self::$config['ignores-cache'] );
 			else
-				$file = $this->basedir . '/wp-l10n-validator-ignores.json';
+				$file = $this->basedir . '/wp-l10n-validator-ignores.cache';
 		}
 
 		return parent::save_json_file( $file, $this->ignores );
