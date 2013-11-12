@@ -1,0 +1,10 @@
+{
+	"textdomain":"textdomain",
+	"config":"wordpress",
+	"ignored-functions": {
+		"func_to_ignore":true
+	},
+	"ignored-strings": [
+		"Dlrow olleh"
+	]
+}
