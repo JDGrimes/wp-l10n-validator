@@ -1330,7 +1330,7 @@ class WP_L10n_Validator {
 				foreach ( $this->func_stack as $func ) {
 
 					$i++;
-					$func_stack = "\n\t\t {$i}. {$func['name']}( " . ( $func['arg_count'] + 1 ) . " )";
+					$func_stack .= "\n\t\t {$i}. {$func['name']}( " . ( $func['arg_count'] + 1 ) . " )";
 				}
 			}
 		}
