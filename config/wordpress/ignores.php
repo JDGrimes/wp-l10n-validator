@@ -77,10 +77,10 @@ $parser->add_ignored_functions(
 		'$wpdb->get_results' => true,
 		'$wpdb->get_var'     => true,
 		'$wpdb->get_col'     => true,
-		// New instance calls.
-		'new File_Upload_Upgrader' => true,
-		'new WP_Date_Query'        => true,
-		'new WP_Error'             => array( 1 ),
+		// Static/parent method calls.
+		'File_Upload_Upgrader::__construct' => true,
+		'WP_Date_Query::__construct'        => true,
+		'WP_Error::__construct'             => array( 1 ),
 	)
 );
 
