@@ -22,3 +22,5 @@ $( 'a' ).addClass( 'link' );
 </script>
 <a href="http://example.com/" title="catch me"><?php _e( 'link', 'wp-l10n-validator-tests' ); ?></a>
 <a href="<?php echo $url; ?>" id="<?php echo $id; ?>"></a>
+<p id="<?php echo $pid; ?>" class="test"></p>
+<img src="<?php echo $img_url; ?>" alt="" />

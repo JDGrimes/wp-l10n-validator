@@ -1188,13 +1188,18 @@ class WP_L10n_Validator {
 		if ( trim( str_replace( array( '\n', '\r', '/>', '"', '\'', '>' ), '', $text ) ) === '' )
 			return false;
 
-		// Filter out bits of interspersed HTML like " id=", <a href=".
+		// Filter out bits of interspersed HTML like " id=", <a href=", " class="">, or " alt="" />.
 		switch ( $text[0] ) {
 
 			case '<':
 			case '"':
-				if ( strlen( $text ) > 2 && substr_compare( $text, '="', -2, 2 ) === 0 )
-					return false;
+				switch ( substr( $text, -2, 2 ) ) {
+
+					case '="':
+					case '">':
+					case '/>':
+						return false;
+				}
 			break;
 		}
 
