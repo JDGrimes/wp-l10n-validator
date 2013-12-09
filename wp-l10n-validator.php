@@ -469,18 +469,6 @@ class WP_L10n_Validator {
 	}
 
 	/**
-	 * Add to the list of directories to exclude.
-	 *
-	 * @since 0.1.0
-	 *
-	 * @param array|string $dirs The directories to exclude.
-	 */
-	public function exclude_dirs( $dirs ) {
-
-		$this->excluded_dirs += array_flip( (array) $dirs );
-	}
-
-	/**
 	 * Parse the project.
 	 *
 	 * Parses all .php files in the project's base directory and any subdirectories.
