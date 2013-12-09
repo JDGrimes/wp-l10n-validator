@@ -203,6 +203,15 @@ class WP_L10n_Validator {
 	//
 
 	/**
+	 * Whether any errors have been found.
+	 *
+	 * @since 0.1.2
+	 *
+	 * @type bool $errors
+	 */
+	protected static $errors;
+
+	/**
 	 * The config callbacks.
 	 *
 	 * @since 0.1.0
@@ -608,6 +617,7 @@ class WP_L10n_Validator {
 	 */
 	private function _parse_file() {
 
+		self::$errors = false;
 		$check_hash = true;
 		$file = $this->basedir . $this->filename;
 
@@ -629,13 +639,26 @@ class WP_L10n_Validator {
 
 		$checksum = hash( 'md5', $content );
 
-		if ( $check_hash && isset( $this->cache[ $this->filename ]['hash'] ) && $checksum == $this->cache[ $this->filename ]['hash'] ) {
+		/*
+		 * If we need to check the hash, and we find that the old hash is cached and
+		 * is the same as the current hash, and the file didn't have any errors
+		 * before, then we skip it.
+		 */
+		if (
+			$check_hash
+			&& isset( $this->cache[ $this->filename ]['hash'] )
+			&& $checksum == $this->cache[ $this->filename ]['hash']
+			&& isset( $this->cache[ $this->filename ]['errors'] )
+			&& ! $this->cache[ $this->filename ]['errors']
+		) {
 			return false;
 		}
 
 		$this->cache[ $this->filename ]['hash'] = $checksum;
 
 		$this->_parse_string( $content );
+
+		$this->cache[ $this->filename ]['errors'] = self::$errors;
 
 		return true;
 	}
@@ -1508,6 +1531,8 @@ class WP_L10n_Validator {
 	 * @param string $message The error message.
 	 */
 	public static function error( $message ) {
+
+		self::$errors = true;
 
 		fwrite( STDERR, $message . "\n" );
 	}
