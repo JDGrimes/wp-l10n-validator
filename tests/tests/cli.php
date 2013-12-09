@@ -11,7 +11,8 @@
  * Test that the bash commands function properly.
  *
  * @since 0.1.1
- * @group dev
+ *
+ * @group cli
  */
 class WP_L10n_Validator_CLI_Test extends PHPUnit_Framework_TestCase {
 
