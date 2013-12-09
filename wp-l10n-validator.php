@@ -143,6 +143,20 @@ class WP_L10n_Validator {
 	protected $in_class;
 
 	/**
+	 * Whether we have just encountered a function declaration.
+	 *
+	 * This has the value 'func_name' if we have just hit the 'function' token, and
+	 * should be on the lookout for the function name. Then when the opening curly
+	 * bracket of the function body is encountered it is set to 'braces', and will be
+	 * set back to false when the closing bracket is found.
+	 *
+	 * @since 0.1.2
+	 *
+	 * @type bool|string $in_func_declaration
+	 */
+	protected $in_func_declaration;
+
+	/**
 	 * The function call stack.
 	 *
 	 * This keeps track of the stack when a function is called within a call to
@@ -545,14 +559,15 @@ class WP_L10n_Validator {
 	public function get_parser_state() {
 
 		return array(
-			'filename'       => $this->filename,
-			'line'           => $this->line_number,
-			'cur_func'       => $this->cur_func,
-			'func_stack'     => $this->func_stack,
-			'in_include'     => $this->in_include,
-			'in_switch_case' => $this->in_switch_case,
-			'in_new_class'   => $this->in_new_class,
-			'in_class'       => $this->in_class,
+			'filename'            => $this->filename,
+			'line'                => $this->line_number,
+			'cur_func'            => $this->cur_func,
+			'func_stack'          => $this->func_stack,
+			'in_include'          => $this->in_include,
+			'in_switch_case'      => $this->in_switch_case,
+			'in_new_class'        => $this->in_new_class,
+			'in_class'            => $this->in_class,
+			'in_func_declaration' => $this->in_func_declaration,
 		);
 	}
 
@@ -650,6 +665,8 @@ class WP_L10n_Validator {
 		$brackets = 0;
 		$braces   = 0;
 
+		$func_dec_braces = false;
+
 		$in_extends = false;
 
 		$tokens = token_get_all( $content );
@@ -666,6 +683,12 @@ class WP_L10n_Validator {
 					case T_STRING:
 						// Find out what this string would look like if it were a function.
 						$full_function = $text;
+
+						if ( $this->debug_marker == $full_function ) {
+
+							$this->debug_callback();
+							break;
+						}
 
 						while ( isset( $tokens[ $index - 2 ][1], $tokens[ $index - 1 ][1] ) ) {
 
@@ -714,6 +737,10 @@ class WP_L10n_Validator {
 							$this->in_class = array( 'self' => $full_function );
 							break;
 
+						} elseif ( $this->in_class && 'func_name' == $this->in_func_declaration ) {
+
+							$full_function = $this->in_class['self'] . '::' . $full_function;
+
 						} elseif ( $in_extends ) {
 
 							$this->in_class['parent'] = $full_function;
@@ -722,11 +749,7 @@ class WP_L10n_Validator {
 
 						}
 
-						if ( $this->debug_marker == $full_function ) {
-
-							$this->debug_callback();
-
-						} elseif ( isset( $this->l10n_functions[ $full_function ] ) ) {
+						if ( isset( $this->l10n_functions[ $full_function ] ) ) {
 
 							// This is a l10n function.
 							$this->_enter_function( $full_function, 'l10n' );
@@ -843,6 +866,12 @@ class WP_L10n_Validator {
 						$this->in_class = true;
 					break;
 
+					case T_FUNCTION:
+						if ( $this->in_func_declaration != 'braces' ) {
+							$this->in_func_declaration = 'func_name';
+						}
+					break;
+
 					case T_EXTENDS:
 						$in_extends = true;
 					break;
@@ -924,13 +953,28 @@ class WP_L10n_Validator {
 
 					// Keep track of curly braces when we are in a class declaration.
 					case '{':
-						if ( $this->in_class )
+						if ( $this->in_class ) {
+
+							if ( 'func_name' == $this->in_func_declaration ) {
+								$func_dec_braces = $braces;
+								$this->in_func_declaration = 'braces';
+							}
+
 							$braces++;
+						}
 					break;
 
 					case '}':
-						if ( $this->in_class && 0 == --$braces )
-							$this->in_class = false;
+						if ( $this->in_class ) {
+
+							if ( 'braces' == $this->in_func_declaration && $braces === $func_dec_braces ) {
+								$this->in_func_declaration = $func_dec_braces = false;
+							}
+
+							if ( 0 == --$braces ) {
+								$this->in_class = false;
+							}
+						}
 					break;
 
 					case ';':
@@ -1350,6 +1394,7 @@ class WP_L10n_Validator {
 			. "\n\t In include: " . ( $this->in_include ? 'yes' : 'no' )
 			. "\n\t In switch case: " . ( $this->in_switch_case ? 'yes' : 'no' )
 			. "\n\t In new class: " . ( $this->in_new_class ? 'yes' : 'no' )
+			. "\n\t In function declaration: " . ( $this->in_func_declaration ? $this->in_func_declaration : 'no' )
 			. $in_class
 			. $func_stack
 		);

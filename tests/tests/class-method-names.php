@@ -31,6 +31,9 @@ class Class_Method_Name_Test extends WP_L10n_Validator_UnitTestCase {
 	public function test_class_method_names() {
 
 		$expected = array(
+			'FWIW::private_thoughts',
+			'FWIW::what_i_think',
+			'inner_func',
 			'IMHO::init_opinion',
 			'FWIW::reason',
 			'FWIW::add_bias',

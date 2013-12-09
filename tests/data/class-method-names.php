@@ -9,7 +9,13 @@
 
 class FWIW extends IMHO {
 
-	public function what_i_think( $topic ) {
+	private function private_thoughts( _debug_ );
+
+	public function what_i_think( $topic _debug_ ) {
+
+		function inner_func( _debug_ ) {}
+
+		$func = function() {};
 
 		$this->topic = $topic;
 
@@ -24,3 +30,5 @@ class FWIW extends IMHO {
 $wpdb->query( _debug_ );
 
 $query = new WP_Query( _debug_ );
+
+$func = function() {}
