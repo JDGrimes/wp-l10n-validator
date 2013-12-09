@@ -104,6 +104,15 @@ class WP_L10n_Validator {
 	protected $args_started;
 
 	/**
+	 * The name of the current HTML attribute.
+	 *
+	 * @since 0.1.2
+	 *
+	 * @type string $cur_attr
+	 */
+	protected $cur_attr;
+
+	/**
 	 * Whether we are in an include/require(_once) statement.
 	 *
 	 * @since 0.1.0
@@ -562,6 +571,7 @@ class WP_L10n_Validator {
 			'filename'            => $this->filename,
 			'line'                => $this->line_number,
 			'cur_func'            => $this->cur_func,
+			'cur_attr'            => $this->cur_attr,
 			'func_stack'          => $this->func_stack,
 			'in_include'          => $this->in_include,
 			'in_switch_case'      => $this->in_switch_case,
@@ -652,14 +662,16 @@ class WP_L10n_Validator {
 			return;
 
 		// Reset the parser.
-		$this->args_started   = false;
-		$this->cur_func       = false;
-		$this->in_include     = false;
-		$this->in_switch_case = false;
-		$this->in_new_class   = false;
-		$this->in_class       = false;
-		$this->line_number    = 1;
-		$this->func_stack     = array();
+		$this->args_started        = false;
+		$this->cur_func            = false;
+		$this->cur_attr            = false;
+		$this->in_include          = false;
+		$this->in_switch_case      = false;
+		$this->in_new_class        = false;
+		$this->in_class            = false;
+		$this->in_func_declaration = false;
+		$this->line_number         = 1;
+		$this->func_stack          = array();
 
 		// The number of open brackets ([) and braces ({).
 		$brackets = 0;
@@ -1194,8 +1206,11 @@ class WP_L10n_Validator {
 
 					$attr_value = $html_atts[2][ $key ] . $html_atts[3][ $key ];
 
-					if ( ! empty( $attr_value ) && ( $attr_value = $this->prepare_non_gettext( $attr_value ) ) )
+					if ( ! empty( $attr_value ) && ( $attr_value = $this->prepare_non_gettext( $attr_value ) ) ) {
+
+						$this->cur_attr = $attr_names[ $key ];
 						$this->report_non_gettext( $attr_value );
+					}
 
 					$keep_looping = next( $attr_names );
 				}
@@ -1285,14 +1300,23 @@ class WP_L10n_Validator {
 	 */
 	protected function report_non_gettext( $text ) {
 
-		$func_text = '';
+		$extra = '';
 
 		if ( $this->cur_func ) {
 
-			$func_text = " {$this->cur_func['name']}( " . ( $this->cur_func['arg_count'] + 1 ) . " )";
+			$extra = " {$this->cur_func['name']}( " . ( $this->cur_func['arg_count'] + 1 ) . " )";
+
+			foreach ( $this->func_stack as $func ) {
+
+				$extra = " {$func['name']}( " . ( $func['arg_count'] + 1 ) . "{$extra} )";
+			}
+
+		} elseif ( $this->cur_attr ) {
+
+			$extra = " {$this->cur_attr}=''";
 		}
 
-		$this->error( "{$this->filename}#{$this->line_number}{$func_text}: Non gettexted string '{$text}'" );
+		$this->error( "{$this->filename}#{$this->line_number}{$extra}: Non gettexted string '{$text}'" );
 	}
 
 	/**
