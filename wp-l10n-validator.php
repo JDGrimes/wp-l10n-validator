@@ -746,7 +746,6 @@ class WP_L10n_Validator {
 							$this->in_class['parent'] = $full_function;
 							$in_extends = false;
 							break;
-
 						}
 
 						if ( isset( $this->l10n_functions[ $full_function ] ) ) {
@@ -1021,7 +1020,6 @@ class WP_L10n_Validator {
 	private function _enter_function( $function, $type ) {
 
 		$this->args_started = false;
-
 
 		switch ( $type ) {
 
