@@ -12,7 +12,7 @@
  * @link http://plugins.svn.wordpress.org/codestyling-localization/trunk/codestyling-localization.php Revision 778516 (~1.99.30)
  *
  * @package WP_L10n_Validator
- * @version 0.1.0
+ * @version 0.1.2-beta
  * @since   0.1.0
  * @author  J.D. Grimes <jdg@codesymphony.co>
  * @license GPLv2
