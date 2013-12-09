@@ -16,13 +16,6 @@
  * @since   0.1.0
  * @author  J.D. Grimes <jdg@codesymphony.co>
  * @license GPLv2
- *
- *
- * @todo -
- *       ? parse single file from the command line
- *       ? Allow directory/files to be excluded
- *       * Ignore child class methods based on parent class
- *       * re-parse cached files with errors
  */
 
 /**
