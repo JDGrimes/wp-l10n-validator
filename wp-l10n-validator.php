@@ -1064,6 +1064,27 @@ class WP_L10n_Validator {
 			break;
 		}
 
+		// Ignore child class methods based on parent class.
+		if (
+				$type != 'ignored'
+			&&
+				! empty( $this->in_class['parent'] )
+			&&
+			 	strpos( $function, "{$this->in_class['self']}::" ) == 0
+			&&
+				isset(
+					$this->ignored_functions[
+						str_replace(
+							"{$this->in_class['self']}::"
+							, "{$this->in_class['parent']}::"
+							, $function
+						)
+					]
+				)
+		) {
+			$type = 'ignored';
+		}
+
 		if ( $this->cur_func ) {
 
 			if ( $this->cur_func['type'] == 'l10n' && ! isset( $this->non_string_l10n_args[ $this->cur_func['arg_count'] ][ $this->cur_func['name'] ] ) ) {

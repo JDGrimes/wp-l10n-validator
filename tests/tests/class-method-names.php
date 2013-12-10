@@ -24,6 +24,19 @@ class Class_Method_Name_Test extends WP_L10n_Validator_UnitTestCase {
 	protected static $file = '/class-method-names.php';
 
 	/**
+	 * Set up ignores.
+	 *
+	 * Part of the test is checking that a method is ignored in a child class if it
+	 * is ignored in the parent class.
+	 *
+	 * @since 0.1.2
+	 */
+	public static function configure_parser( $parser ) {
+
+		$parser->add_ignored_functions( array( 'IMHO::ignored' => true ) );
+	}
+
+	/**
 	 * Test that the class method names are correct.
 	 *
 	 * @since 0.1.0

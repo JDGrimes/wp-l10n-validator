@@ -87,6 +87,8 @@ class WP_L10n_Validator_UnitTestCase extends PHPUnit_Framework_TestCase {
 
 		$parser->save_cahce = false;
 
+		static::configure_parser( $parser );
+
 		$parser->parse_file( static::$file );
 
 		self::$errors = $parser->get_results();
@@ -108,6 +110,13 @@ class WP_L10n_Validator_UnitTestCase extends PHPUnit_Framework_TestCase {
 		if ( ! empty( self::$debugs ) )
 			var_dump( self::$debugs );
 	}
+
+	/**
+	 * Configure the parser.
+	 *
+	 * @since 0.1.2
+	 */
+	public static function configure_parser( $parser ) {}
 
 	/**
 	 * Mark an error as expected.
