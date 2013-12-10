@@ -10,6 +10,7 @@
 $parser->add_ignored_functions(
 	array(
 		// Functions.
+		'_deprecated_argument'  => array( 1, 2 ),
 		'_deprecated_function'  => true,
 		'add_action'            => true,
 		'add_filter'            => true,
@@ -41,11 +42,14 @@ $parser->add_ignored_functions(
 		'get_user_meta'         => true,
 		'get_user_option'       => true,
 		'get_user_setting'      => array( 1 ),
+		'load_plugin_textdomain' => true,
 		'network_admin_url'     => true,
+		'plugin_basename'       => true,
 		'plugins_url'           => true,
 		'register_activation_hook' => true,
 		'register_widget'       => true,
 		'remove_filter'         => true,
+		'remove_query_arg'      => true,
 		'sanitize_user_field'   => true,
 		'selected'              => true,
 		'self_admin_url'        => true,
@@ -68,19 +72,23 @@ $parser->add_ignored_functions(
 		'wp_nonce_url'          => true,
 		'wp_register_script'    => true,
 		'wp_register_style'     => true,
+		'wp_reset_vars'         => true,
 		'wp_verify_nonce'       => true,
 		// Instance calls.
-		'$wpdb->insert'      => true,
-		'$wpdb->prepare'     => true,
-		'$wpdb->query'       => true,
-		'$wpdb->update'      => true,
-		'$wpdb->get_results' => true,
-		'$wpdb->get_var'     => true,
-		'$wpdb->get_col'     => true,
+		'$screen->in_admin'          => true,
+		'$wp_list_table->search_box' => array( 2 ),
+		'$wpdb->insert'              => true,
+		'$wpdb->prepare'             => true,
+		'$wpdb->query'               => true,
+		'$wpdb->update'              => true,
+		'$wpdb->get_results'         => true,
+		'$wpdb->get_var'             => true,
+		'$wpdb->get_col'             => true,
 		// Static/parent method calls.
 		'File_Upload_Upgrader::__construct' => true,
 		'WP_Date_Query::__construct'        => true,
 		'WP_Error::__construct'             => array( 1 ),
+		'WP_List_Table::__construct'        => true,
 	)
 );
 

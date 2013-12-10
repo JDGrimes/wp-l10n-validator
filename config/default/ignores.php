@@ -38,12 +38,14 @@ $parser->add_ignored_functions(
 		'define'       => array( 1 ),
 		'defined'      => true,
 		'explode'      => true,
+		'file_exists'  => true,
 		'implode'      => true,
 		'in_array'     => true,
 		'ltrim'        => true,
 		'preg_replace' => true,
 		'sprintf'      => array( 2, 3, 4 ), // More args could be added
 		'str_replace'  => true,
+		'uasort'       => true,
 		'usort'        => true,
 	)
 );
@@ -52,9 +54,11 @@ $parser->add_ignored_atts(
 	array(
 		'action',
 		'class',
+		'enctype',
 		'for',
 		'height',
 		'href',
+		'http-equiv',
 		'id',
 		'method',
 		'name',
