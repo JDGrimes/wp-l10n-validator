@@ -39,3 +39,5 @@ $wpdb->query( _debug_ );
 $query = new WP_Query( _debug_ );
 
 $func = function() {}
+
+get_some_class()->method( _debug_ );

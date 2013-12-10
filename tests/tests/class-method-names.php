@@ -53,6 +53,7 @@ class Class_Method_Name_Test extends WP_L10n_Validator_UnitTestCase {
 			'FWIW::add_bias',
 			'$wpdb->query',
 			'WP_Query::__construct',
+			'(unknown)->method',
 		);
 
 		foreach ( $expected as $key => $function_name ) {

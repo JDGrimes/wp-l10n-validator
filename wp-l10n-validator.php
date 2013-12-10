@@ -718,7 +718,7 @@ class WP_L10n_Validator {
 							break;
 						}
 
-						while ( isset( $tokens[ $index - 2 ][1], $tokens[ $index - 1 ][1] ) ) {
+						while ( isset( $tokens[ $index - 1 ][1] ) ) {
 
 							/*
 							 * Attempt to get a full method name in OO code.
@@ -727,28 +727,34 @@ class WP_L10n_Validator {
 
 								case '::':
 								case '->':
-									switch ( $tokens[ $index - 2 ][ 1 ] ) {
+									if ( isset( $tokens[ $index - 2 ][1] ) ) {
+										switch ( $tokens[ $index - 2 ][1] ) {
 
-										case 'self':
-										case '$this':
-										case 'static':
-											if ( isset( $this->in_class['self'] ) ) {
+											case 'self':
+											case '$this':
+											case 'static':
+												if ( isset( $this->in_class['self'] ) ) {
 
-												$full_function = $this->in_class['self'] . '::' . $full_function;
-												break;
-											}
-										// fallthru
+													$full_function = $this->in_class['self'] . '::' . $full_function;
+													break;
+												}
+											// fallthru
 
-										case 'parent':
-											if ( isset( $this->in_class['parent'] ) ) {
+											case 'parent':
+												if ( isset( $this->in_class['parent'] ) ) {
 
-												$full_function = $this->in_class['parent'] . '::' . $full_function;
-												break;
-											}
-										// fallthru
+													$full_function = $this->in_class['parent'] . '::' . $full_function;
+													break;
+												}
+											// fallthru
 
-										default:
-											$full_function = $tokens[ $index - 2 ][1] . $tokens[ $index - 1 ][1] . $full_function;
+											default:
+												$full_function = $tokens[ $index - 2 ][1] . $tokens[ $index - 1 ][1] . $full_function;
+										}
+
+									} else {
+
+										$full_function = '(unknown)' . $tokens[ $index - 1 ][1] . $full_function;
 									}
 
 									$index -= 2;
