@@ -1451,7 +1451,7 @@ class WP_L10n_Validator {
 		}
 
 		$this->error(
-			"{$this->filename}#{$this->line_number}{$func_text}: debug token found."
+			"{$this->filename}#{$this->line_number}{$func_text}: Debug token found."
 			. "\n\t In include: " . ( $this->in_include ? 'yes' : 'no' )
 			. "\n\t In switch case: " . ( $this->in_switch_case ? 'yes' : 'no' )
 			. "\n\t In new class: " . ( $this->in_new_class ? 'yes' : 'no' )
