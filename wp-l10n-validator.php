@@ -903,6 +903,19 @@ class WP_L10n_Validator {
 						$in_extends = true;
 					break;
 
+					/*
+					 * These tokens will be accompanied by closing curly braces, but
+					 * we won't catch the opening brace below (becuase it is part of
+					 * these tokens) so we'll catch it here. Otherwise the parser
+					 * will think that the class declaration has ended before it has.
+					 */
+					case T_CURLY_OPEN:
+					case T_DOLLAR_OPEN_CURLY_BRACES:
+						if ( $this->in_class ) {
+							$braces++;
+						}
+					break;
+
 					case T_WHITESPACE:
 					case T_COMMENT:
 					case T_DOC_COMMENT: break;

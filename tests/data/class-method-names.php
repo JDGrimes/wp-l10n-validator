@@ -21,6 +21,9 @@ class FWIW extends IMHO {
 
 		$this->ignored( 'ignore me' );
 
+		$test = "{$topic}";
+		$test = "${test}";
+
 		parent::init_opinion( _debug_ );
 		$this->reason( _debug_ );
 		self::add_bias( _debug_ );
