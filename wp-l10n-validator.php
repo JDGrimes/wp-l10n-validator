@@ -1251,6 +1251,8 @@ class WP_L10n_Validator {
 
 					$keep_looping = next( $attr_names );
 				}
+
+				$this->cur_attr = false;
 			}
 
 			/*
