@@ -47,6 +47,7 @@ class Class_Method_Name_Test extends WP_L10n_Validator_UnitTestCase {
 			'FWIW::private_thoughts',
 			'FWIW::what_i_think',
 			'inner_func',
+			'FWIW::property->func',
 			'IMHO::init_opinion',
 			'FWIW::reason',
 			'FWIW::add_bias',

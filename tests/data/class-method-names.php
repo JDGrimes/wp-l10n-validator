@@ -24,6 +24,8 @@ class FWIW extends IMHO {
 		$test = "{$topic}";
 		$test = "${test}";
 
+		$this->property->func( _debug_ );
+
 		parent::init_opinion( _debug_ );
 		$this->reason( _debug_ );
 		self::add_bias( _debug_ );

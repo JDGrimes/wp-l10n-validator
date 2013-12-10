@@ -727,25 +727,28 @@ class WP_L10n_Validator {
 
 								case '::':
 								case '->':
-									if ( isset( $this->in_class['self'] ) ) {
+									switch ( $tokens[ $index - 2 ][ 1 ] ) {
 
-										switch ( $tokens[ $index - 2 ][ 1 ] ) {
+										case 'self':
+										case '$this':
+										case 'static':
+											if ( isset( $this->in_class['self'] ) ) {
 
-											case 'self':
-											case '$this':
-											case 'static':
 												$full_function = $this->in_class['self'] . '::' . $full_function;
-											break;
+												break;
+											}
+										// fallthru
 
-											case 'parent':
-												if ( isset( $this->in_class['parent'] ) )
-													$full_function = $this->in_class['parent'] . '::' . $full_function;
-											break;
-										}
+										case 'parent':
+											if ( isset( $this->in_class['parent'] ) ) {
 
-									} else {
+												$full_function = $this->in_class['parent'] . '::' . $full_function;
+												break;
+											}
+										// fallthru
 
-										$full_function = $tokens[ $index - 2 ][1] . $tokens[ $index - 1 ][1] . $full_function;
+										default:
+											$full_function = $tokens[ $index - 2 ][1] . $tokens[ $index - 1 ][1] . $full_function;
 									}
 
 									$index -= 2;
