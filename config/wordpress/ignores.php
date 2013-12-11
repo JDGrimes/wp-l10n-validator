@@ -89,6 +89,7 @@ $parser->add_ignored_functions(
 		'WP_Date_Query::__construct'        => true,
 		'WP_Error::__construct'             => array( 1 ),
 		'WP_List_Table::__construct'        => true,
+		'WP_List_Table::screen->in_admin'   => true,
 	)
 );
 
