@@ -1027,11 +1027,8 @@ class WP_L10n_Validator {
 					break;
 
 					case ';':
-						if ( $this->in_include ) {
-
-							$this->_exit_function();
-							$this->in_include = false;
-						}
+						$this->_exit_function();
+						$this->in_include = false;
 					// fallthru
 
 					case ':':
