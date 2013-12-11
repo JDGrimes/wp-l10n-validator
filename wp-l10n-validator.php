@@ -1016,12 +1016,12 @@ class WP_L10n_Validator {
 					case '}':
 						if ( $this->in_class ) {
 
-							if ( 'braces' == $this->in_func_declaration && $braces === $func_dec_braces ) {
-								$this->in_func_declaration = $func_dec_braces = false;
-							}
-
 							if ( 0 == --$braces ) {
 								$this->in_class = false;
+							}
+
+							if ( 'braces' == $this->in_func_declaration && $braces === $func_dec_braces ) {
+								$this->in_func_declaration = $func_dec_braces = false;
 							}
 						}
 					break;
