@@ -9,14 +9,14 @@ Command-line tool for checking that all strings are properly gettexted for local
   calls, etc., where there should just be an encapsed string– and that all required
   arguments are present.
 * Makes sure the expected textdomain(s) are always used
-* As a side, it also checks that no l10n functions are deprecated.
+* As a side effect, it also checks that no l10n functions are deprecated.
 
 Installation
 ------------
 
 **Requires:** PHP 5.3 or later.
 
-Download or check out the package. Add the `/bin` directory to your `$PATH` (or use
+Download a zip or clone the repo. Add the `/bin` directory to your `$PATH` (or use
 `/path/to/wp-l10n-validator/bin/wp-l10n-validator` instead of just `wp-l10n-validator`
 in your commands.
 
