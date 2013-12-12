@@ -32,3 +32,4 @@ $url = 'http://example.com/';
 $not_url = 'http is a web protocol';
 $ignore = 'all_lowercase_with_underscores';
 $ignore = '_underscore_in_front';
+$catch_me = "Don't $ignore this!";

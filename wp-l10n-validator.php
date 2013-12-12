@@ -839,6 +839,14 @@ class WP_L10n_Validator {
 					break;
 
 					// This token is an encapsed string. We'll want to make sure it's translatable.
+					case T_ENCAPSED_AND_WHITESPACE:
+						/*
+						 * Add one character of whitespace to each side so we won't
+						 * mutilate the string when we trim it below.
+						 */
+						$text = " {$text} ";
+					// fallthru
+
 					case T_CONSTANT_ENCAPSED_STRING:
 						if ( $this->cur_func && $this->cur_func['type'] == 'l10n' ) {
 
