@@ -24,3 +24,5 @@ $( 'a' ).addClass( 'link' );
 <a href="<?php echo $url; ?>" id="<?php echo $id; ?>"></a>
 <p id="<?php echo $pid; ?>" class="test"></p>
 <img src="<?php echo $img_url; ?>" alt="" />
+<p id='<?php echo $pid; ?>' class='test'></p>
+<img src='<?php echo $img_url; ?>' alt='' />

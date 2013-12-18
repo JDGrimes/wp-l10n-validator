@@ -1304,10 +1304,13 @@ class WP_L10n_Validator {
 
 			case '<':
 			case '"':
+			case "'":
 				switch ( substr( $text, -2, 2 ) ) {
 
 					case '="':
+					case "='":
 					case '">':
+					case "'>":
 					case '/>':
 						return false;
 				}
