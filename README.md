@@ -92,11 +92,12 @@ These are the options that you can specify in the the JSON config file:
    ignore the method when it is being called statically from outside the class like
    `My_Class::my_method()`, or inside the class with `self::` or `$this->`. The parser
    does not know what class is assigned to a variable, though it does know the
-   variable name. So you can ignore `$wpdb->query`, which the parser does ignore by
-   default, but adding `wpdb::query` will not match a call to `$wpdb->query()`. Adding
+   variable name. So you can ignore `$wpdb->query`, (which the parser does ignore by
+   default,) but adding `wpdb::query` will not match a call to `$wpdb->query()`. Adding
    a class constructor (`My_Class::__construct`) will ignore `new My_Class()`. Calls
    within a class to `parent::method()` will be mapped to the class that is specified
-   in the `extends` statement.
+   in the `extends` statement. If a method is being ignored in a parent class, it
+   will also be ignored in child classes as well.
  * `ignored-strings` - An array of strings that should always be ignored.
  * `ignored-atts` - An array of HTML attributes to ignore.
  * `bootstrap` - A PHP file providing further, more advanced configuration. You can
