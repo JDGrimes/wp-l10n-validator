@@ -50,6 +50,7 @@ $parser->add_ignored_functions(
 		'register_widget'       => true,
 		'remove_filter'         => true,
 		'remove_query_arg'      => true,
+		'sanitize_html_class'   => true,
 		'sanitize_user_field'   => true,
 		'selected'              => true,
 		'self_admin_url'        => true,

@@ -44,6 +44,7 @@ $parser->add_ignored_functions(
 		'ltrim'        => true,
 		'preg_replace' => true,
 		'sprintf'      => array( 2, 3, 4 ), // More args could be added
+		'str_repeat'   => true,
 		'str_replace'  => true,
 		'uasort'       => true,
 		'usort'        => true,
