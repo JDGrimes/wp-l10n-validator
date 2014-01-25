@@ -336,17 +336,25 @@ class WP_L10n_Validator {
 	 *
 	 * @since 0.1.0
 	 *
-	 * @param string $basedir    The base dir.
-	 * @param string $textdomain The text domain.
+	 * @param string       $basedir    The base dir.
+	 * @param string|array $textdomain A text domain or an array of textdomains. If
+	 *                                 an array, the domains should be the keys.
 	 */
 	public function __construct( $basedir, $textdomain ) {
 
 		$this->basedir = realpath( $basedir );
 
-		// Values currently ignored.
-		$this->textdomains = array(
-			$textdomain => true,
-		);
+		if ( is_array( $textdomain ) ) {
+
+			$this->textdomains = $textdomain;
+
+		} else {
+
+			// Array values currently ignored.
+			$this->textdomains = array(
+				$textdomain => true,
+			);
+		}
 
 		$this->cache_file = self::resolve_path( self::$config['cache'] );
 
