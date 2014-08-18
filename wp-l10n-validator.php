@@ -519,12 +519,44 @@ class WP_L10n_Validator {
 
 			$this->filename = substr( $filename, $base_length );
 
+			if ( $this->is_ignored_file( $this->filename ) ) {
+				continue;
+			}
+
 			 if ( $this->_parse_file() && $this->one_by_one )
 			 	break;
 		}
 
 		if ( $this->save_cache )
 			$this->save_cache();
+	}
+
+	/**
+	 * Check if a file is supposed to be ignored.
+	 *
+	 * @since 0.2.0
+	 *
+	 * @param string $file The path to the file relative to the project root.
+	 *
+	 * @return bool True if the file is ignored, otherwise false.
+	 */
+	public function is_ignored_file( $file ) {
+
+		if (
+			! isset( self::$config['ignored-paths'] )
+			|| ! is_array( self::$config['ignored-paths'] )
+		) {
+			return false;
+		}
+
+		foreach ( self::$config['ignored-paths'] as $path ) {
+
+			if ( substr( $file, 0, strlen( $path ) ) === $path ) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/**
