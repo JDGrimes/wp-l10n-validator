@@ -1,6 +1,8 @@
 WP L10n Validator
 =================
 
+[![Build Status](https://travis-ci.org/JDGrimes/wp-l10n-validator.png?branch=master)](https://travis-ci.org/JDGrimes/wp-l10n-validator)
+
 Command-line tool for checking that all strings are properly gettexted for localization in WordPress plugins and themes.
 
 * Finds any untranslated strings in HTML
