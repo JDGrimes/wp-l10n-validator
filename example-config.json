@@ -20,5 +20,10 @@
 	"ignored-atts": [
 		"data-foo"
 	],
+	"ignored-paths": [
+		"/vendor/",
+		"/some-file.php",
+		"/sub-dir/file.php"
+	],
 	"bootstrap":"./tools/wp-l10n-validator/config.php"
 }
