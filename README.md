@@ -100,7 +100,7 @@ These are the options that you can specify in the the JSON config file:
    will also be ignored in child classes as well.
  * `ignored-strings` - An array of strings that should always be ignored.
  * `ignored-atts` - An array of HTML attributes to ignore.
- * `ignored-files` - An array of file and folder paths to ignore. (Since 0.2.0)
+ * `ignored-paths` - An array of file and folder paths to ignore. (Since 0.2.0)
  * `bootstrap` - A PHP file providing further, more advanced configuration. You can
    even write your own child class to extend the validator. This allows you to change
    the output method by overriding the `report_*` functions, for example. Just assign
