@@ -11,6 +11,7 @@ $parser->add_ignored_functions(
 	array(
 		// Functions.
 		'_deprecated_argument'  => array( 1, 2 ),
+		'_deprecated_file'      => array( 1, 2 ),
 		'_deprecated_function'  => true,
 		'add_action'            => true,
 		'add_filter'            => true,

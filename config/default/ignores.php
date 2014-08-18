@@ -48,6 +48,7 @@ $parser->add_ignored_functions(
 		'str_replace'  => true,
 		'uasort'       => true,
 		'usort'        => true,
+		'version_compare' => true,
 	)
 );
 
