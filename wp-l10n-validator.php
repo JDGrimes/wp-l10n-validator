@@ -1751,7 +1751,7 @@ class WP_L10n_Validator {
 
 			unset( $args[ $key ] );
 			$args = array_values( $args );
-			$parsed_args['one_by_one'] = true;
+			$parsed_args['one-by-one'] = true;
 		}
 
 		if ( ! isset( $args[1] ) ) {
