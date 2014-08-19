@@ -44,12 +44,14 @@ $parser->add_ignored_functions(
 		'get_user_meta'         => true,
 		'get_user_option'       => true,
 		'get_user_setting'      => array( 1 ),
+		'get_users'             => true,
 		'load_plugin_textdomain' => true,
 		'network_admin_url'     => true,
 		'plugin_basename'       => true,
 		'plugins_url'           => true,
 		'register_activation_hook' => true,
 		'register_post_type'    => array( 1 ),
+		'register_setting'      => true,
 		'register_widget'       => true,
 		'remove_filter'         => true,
 		'remove_query_arg'      => true,
@@ -94,6 +96,7 @@ $parser->add_ignored_functions(
 		'WP_Error::__construct'             => array( 1 ),
 		'WP_List_Table::__construct'        => true,
 		'WP_List_Table::screen->in_admin'   => true,
+		'WP_Widget::__construct'            => array( 1 ),
 	)
 );
 
