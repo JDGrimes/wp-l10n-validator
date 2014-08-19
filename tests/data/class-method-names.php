@@ -7,6 +7,10 @@
  * @since 0.1.0
  */
 
+function some_func() {
+	// See #5
+}
+
 class FWIW extends IMHO {
 
 	private function private_thoughts( _debug_ );

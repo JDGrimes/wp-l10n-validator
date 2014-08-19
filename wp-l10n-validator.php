@@ -1058,6 +1058,12 @@ class WP_L10n_Validator {
 							}
 
 							$braces++;
+
+						} else {
+
+							if ( 'func_name' === $this->in_func_declaration ) {
+								$this->in_func_declaration = false;
+							}
 						}
 					break;
 
