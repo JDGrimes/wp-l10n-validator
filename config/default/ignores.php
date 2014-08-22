@@ -39,6 +39,7 @@ $parser->add_ignored_functions(
 		'defined'      => true,
 		'explode'      => true,
 		'file_exists'  => true,
+		'glob'         => true,
 		'implode'      => true,
 		'in_array'     => true,
 		'ltrim'        => true,
