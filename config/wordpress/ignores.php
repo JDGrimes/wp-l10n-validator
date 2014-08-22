@@ -49,6 +49,7 @@ $parser->add_ignored_functions(
 		'network_admin_url'     => true,
 		'plugin_basename'       => true,
 		'plugins_url'           => true,
+		'post_type_supports'    => true,
 		'register_activation_hook' => true,
 		'register_post_type'    => array( 1 ),
 		'register_setting'      => true,
