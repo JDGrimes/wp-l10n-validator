@@ -55,6 +55,7 @@ $parser->add_ignored_functions(
 $parser->add_ignored_atts(
 	array(
 		'action',
+		'autocomplete',
 		'class',
 		'enctype',
 		'for',
