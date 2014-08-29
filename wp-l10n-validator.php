@@ -466,6 +466,21 @@ class WP_L10n_Validator {
 	}
 
 	/**
+	 * Update the list of functions to ignore.
+	 *
+	 * @since 0.2.0
+	 *
+	 * @param array $functions The names of the functions to add/update.
+	 */
+	public function update_ignored_functions( array $functions ) {
+
+		$this->ignored_functions = array_merge(
+			$this->ignored_functions
+			, $functions
+		);
+	}
+
+	/**
 	 * Remove functions from the ignored list.
 	 *
 	 * @since 0.1.0
@@ -490,6 +505,18 @@ class WP_L10n_Validator {
 	}
 
 	/**
+	 * Update the list of ignored HTML attributes.
+	 *
+	 * @since 0.2.0
+	 *
+	 * @param array $atts An array of attribute names.
+	 */
+	public function update_ignored_atts( array $atts ) {
+
+		$this->ignored_atts = array_merge( $this->ignored_atts, $atts );
+	}
+
+	/**
 	 * Add to the list of ignored strings.
 	 *
 	 * @since 0.1.0
@@ -499,6 +526,21 @@ class WP_L10n_Validator {
 	public function add_ignored_strings( $strings ) {
 
 		$this->ignored_strings += array_flip( (array) $strings );
+	}
+
+	/**
+	 * Update the list of ignored strings.
+	 *
+	 * @since 0.2.0
+	 *
+	 * @param array|string $strings The strings to ignore.
+	 */
+	public function update_ignored_strings( $strings ) {
+
+		$this->ignored_strings = array_merge(
+			$this->ignored_strings
+			, array_flip( (array) $strings )
+		);
 	}
 
 	/**
