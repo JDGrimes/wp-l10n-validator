@@ -1713,9 +1713,9 @@ class WP_L10n_Validator {
 			}
 
 			$parser->one_by_one = $args['one-by-one'];
-			$parser->add_ignored_functions( $args['ignored-functions'] );
-			$parser->add_ignored_strings( $args['ignored-strings'] );
-			$parser->add_ignored_atts( $args['ignored-atts'] );
+			$parser->update_ignored_functions( $args['ignored-functions'] );
+			$parser->update_ignored_strings( $args['ignored-strings'] );
+			$parser->update_ignored_atts( $args['ignored-atts'] );
 		}
 
 		// Parse the project.
