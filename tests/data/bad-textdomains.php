@@ -9,3 +9,4 @@
 
 $a = __( 'test', 'wp-l10n-validator-tests' ); // Valid.
 $b = __( 'test', 'wp-l10n-validator-test' );  // Oops.
+$c = __( 'test' ); // Oops.

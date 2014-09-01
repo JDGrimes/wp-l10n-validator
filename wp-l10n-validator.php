@@ -1075,6 +1075,13 @@ class WP_L10n_Validator {
 
 									$this->report_required_args( $required_args + 1 );
 								}
+
+								if (
+									$this->cur_func['arg_count'] < $this->l10n_functions[ $this->cur_func['name'] ]['textdomain']
+									&& ! isset( $this->textdomains[''] )
+								) {
+									$this->report_unexpected_textdomain( '' );
+								}
 							}
 
 							$this->_exit_function();

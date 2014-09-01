@@ -31,5 +31,6 @@ class WP_L10n_Validator_Textdomain_Test extends WP_L10n_Validator_UnitTestCase {
 	public function test_invalid_textdomains_found() {
 
 		$this->assertFoundUnexpectedTextdomain( 'wp-l10n-validator-test' );
+		$this->assertFoundUnexpectedTextdomain( '' );
 	}
 }
