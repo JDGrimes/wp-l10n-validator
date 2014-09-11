@@ -68,8 +68,10 @@ $parser->add_ignored_atts(
 		'name',
 		'onclick',
 		'scope',
+		'size',
 		'style',
 		'type',
+		'valign',
 		'width',
 	)
 );
