@@ -47,6 +47,7 @@ $parser->add_ignored_functions(
 		'sprintf'      => array( 2, 3, 4 ), // More args could be added
 		'str_repeat'   => true,
 		'str_replace'  => true,
+		'strtotime'    => true,
 		'uasort'       => true,
 		'usort'        => true,
 		'version_compare' => true,
