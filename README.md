@@ -1,7 +1,5 @@
-WP L10n Validator
+WP L10n Validator [![Build Status](https://travis-ci.org/JDGrimes/wp-l10n-validator.png?branch=master)](https://travis-ci.org/JDGrimes/wp-l10n-validator)
 =================
-
-[![Build Status](https://travis-ci.org/JDGrimes/wp-l10n-validator.png?branch=master)](https://travis-ci.org/JDGrimes/wp-l10n-validator)
 
 Command-line tool for checking that all strings are properly gettexted for localization in WordPress plugins and themes.
 
@@ -18,7 +16,7 @@ Installation
 
 **Requires:** PHP 5.3 or later.
 
-Download a zip or clone the repo. Add the `/bin` directory to your `$PATH` (or use
+Download a zip, clone the repo, or add to composer dependecies. Add the `/bin` directory to your `$PATH` (or use
 `/path/to/wp-l10n-validator/bin/wp-l10n-validator` instead of just `wp-l10n-validator`
 in your commands.
 
@@ -124,3 +122,8 @@ Credits
 
 * [Codestyling Localization](http://wordpress.org/plugins/codestyling-localization/) for initial parser code.
 * [@nikola-tmw](https://github.com/nikolov-tmw) for pointing me in the right direction on wp-hackers.
+ 
+License
+-------
+
+Dual licensed under GPLv2 and MIT licenses.
