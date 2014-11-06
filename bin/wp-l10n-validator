@@ -12,5 +12,10 @@ if ( ($key = array_search( '-c', $argv )) ) {
 } else {
 
 	require_once dirname( __DIR__ ) . '/wp-l10n-validator.php';
-	WP_L10n_Validator::cli();
+
+	$parser = WP_L10n_Validator::cli();
+
+	if ( false !== $parser->had_errors() ) {
+		exit( 1 );
+	}
 }

@@ -25,9 +25,11 @@ class WP_L10n_Validator_CLI_Test extends PHPUnit_Framework_TestCase {
 
 		$output = $this->run_command( 'wp-l10n-validator', '/no-config' );
 		$this->assertEquals( 0, strpos( $output, 'Usage:' ) );
+		$this->assertEquals( 1, $this->exit_code );
 
 		$output = $this->run_command( 'wp-l10n-validator textdomain', '/no-config' );
 		$this->assertEquals( "/no-config.php#16: Non gettexted string 'Hello world'", $output );
+		$this->assertEquals( 1, $this->exit_code );
 
 		$output = $this->run_command( 'wp-l10n-validator textdomain default', '/no-config' );
 		$this->assertEquals(
@@ -37,6 +39,7 @@ class WP_L10n_Validator_CLI_Test extends PHPUnit_Framework_TestCase {
 			. "\n/no-config.php#21 _e( 2 ): Non gettexted string 'textdomain'"
 			, $output
 		);
+		$this->assertEquals( 1, $this->exit_code );
 	}
 
 	/**
@@ -48,6 +51,7 @@ class WP_L10n_Validator_CLI_Test extends PHPUnit_Framework_TestCase {
 
 		$output = $this->run_command( 'wp-l10n-validator', '/with-config' );
 		$this->assertEquals( "/with-config.php#16: Non gettexted string 'Hello world'", $output );
+		$this->assertEquals( 1, $this->exit_code );
 	}
 
 	/**
@@ -59,6 +63,7 @@ class WP_L10n_Validator_CLI_Test extends PHPUnit_Framework_TestCase {
 
 		$output = $this->run_command( 'wp-l10n-validator -c', '/with-config' );
 		$this->assertEmpty( $output );
+		$this->assertEquals( 0, $this->exit_code );
 
 		$ignores_cache = dirname( __DIR__ ) . '/data/with-config/wp-l10n-validator-ignores.cache';
 
@@ -68,6 +73,7 @@ class WP_L10n_Validator_CLI_Test extends PHPUnit_Framework_TestCase {
 		unlink( $ignores_cache );
 
 		$this->assertEquals( array( '/with-config.php' => array( 'Hello world' => array( 16 => false ) ) ), json_decode( $content, true ) );
+		$this->assertEquals( 0, $this->exit_code );
 	}
 
 	/**
@@ -85,7 +91,8 @@ class WP_L10n_Validator_CLI_Test extends PHPUnit_Framework_TestCase {
 		$command = dirname( dirname( __DIR__ ) ) . '/bin/' . $command;
 		$working_dir = dirname( __DIR__ ) . '/data' . $working_dir;
 
-		$process = proc_open( $command, array( 2 => array( 'pipe', 'w' ) ), $pipes, $working_dir );
+		$spec = array( 2 => array( 'pipe', 'w' ), 3 => array( 'pipe', 'w' ) );
+		$process = proc_open( $command, $spec, $pipes, $working_dir );
 
 		if ( is_resource( $process ) ) {
 
@@ -94,9 +101,12 @@ class WP_L10n_Validator_CLI_Test extends PHPUnit_Framework_TestCase {
 				usleep( 10000 );
 			}
 
+			$this->exit_code = $proc_status['exitcode'];
+
 			$output = stream_get_contents( $pipes[2] );
 
 			fclose( $pipes[2] );
+			fclose( $pipes[3] );
 			proc_close( $process );
 
 			@unlink( $working_dir . '/wp-l10n-validator.cache' );
