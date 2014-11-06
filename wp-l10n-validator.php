@@ -665,6 +665,18 @@ class WP_L10n_Validator {
 		);
 	}
 
+	/**
+	 * Check if there were any errors.
+	 *
+	 * @since 0.2.0
+	 *
+	 * @return bool True if there were errors, false otherwise.
+	 */
+	public function had_errors() {
+
+		return self::$errors;
+	}
+
 	//
 	// Public Static Methods.
 	//
