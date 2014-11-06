@@ -1,0 +1,17 @@
+{
+    "name": "jdgrimes/wp-l10n-validator",
+    "description": "Gettext localization validator for WordPress",
+    "homepage": "https://github.com/JDGrimes/wp-l10n-validator",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "J.D. Grimes",
+            "email": "jdg@codesymphony.co",
+            "homepage": "http://codesymphony.co",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.0"
+    }
+}
