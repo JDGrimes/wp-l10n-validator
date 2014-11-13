@@ -44,7 +44,8 @@ Flags:
    and line number, so that they will be ignored in future. This is especially useful
    for strings that you want to ignore only in a specific location. If the line number
    that a string is on changes, but by less than 5 lines, it will continue to be
-   ignored and the line number will be updated in the cache.
+   ignored and the line number will be updated in the cache. You can change the number
+   of lines tolerance using the `ignores-tolerance` [configuration option](#configuration).
 
 The validator will display any errors it finds.
 
@@ -86,6 +87,8 @@ These are the options that you can specify in the the JSON config file:
  * `cache` - The file to store the cache in. The default is `wp-l10n-validator.cache`.
  * `ignores-cache` - The file to store the specific ignores cache in. The default is
    `wp-l10n-validator-ignores.cache`. See the `-c` flag above for more information.
+ * `ignores-tolerance` - The number of lines of difference to allow for when checking
+   against the ignores cache. The default is 5.
  * `ignored-functions` - An associative array of functions to ignore. The value can be
    an array of specific arguments to be ignored (by argument number), or simply `true`.
    To ignore a class method, add it like this `My_Class::my_method`. This will only
@@ -122,7 +125,7 @@ Credits
 
 * [Codestyling Localization](http://wordpress.org/plugins/codestyling-localization/) for initial parser code.
 * [@nikola-tmw](https://github.com/nikolov-tmw) for pointing me in the right direction on wp-hackers.
- 
+
 License
 -------
 

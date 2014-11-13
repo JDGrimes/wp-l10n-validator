@@ -1783,6 +1783,10 @@ class WP_L10n_Validator {
 			$parser->update_ignored_functions( $args['ignored-functions'] );
 			$parser->update_ignored_strings( $args['ignored-strings'] );
 			$parser->update_ignored_atts( $args['ignored-atts'] );
+
+			if ( isset( $args['ignores-tolerance'] ) ) {
+				$parser->ignores_tolerance = (int) $args['ignores-tolerance'];
+			}
 		}
 
 		// Parse the project.
