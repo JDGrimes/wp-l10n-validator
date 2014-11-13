@@ -1433,6 +1433,11 @@ class WP_L10n_Validator {
 			// Filter out URLs.
 			if ( strpos( $text, 'http' ) === 0 && strpos( $text, '/' ) )
 				return false;
+
+			// Filter out file paths.
+			if ( '/' === $text{0} || '.php' === substr( $text, -4 ) || '/' === substr( $text, -1 ) ) {
+				return false;
+			}
 		}
 
 		if ( isset( $this->ignored_strings[ $text ] ) )
