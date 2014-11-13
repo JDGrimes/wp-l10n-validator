@@ -4,11 +4,11 @@
  * Plugin Name: No config
  */
 
-function do_some_things() {
+function do_some_things( $var ) {
 
-	global $wpdb;
+	$var = apply_filters( 'some-filter' );
 
-	return $wpdb->get_results( 'SELECT * FROM ' . $wpdb->posts );
+	return $var;
 }
 
 function do_some_other_stuff() {
