@@ -1443,6 +1443,10 @@ class WP_L10n_Validator {
 		if ( isset( $this->ignored_strings[ $text ] ) )
 			return false;
 
+		if ( $this->looks_like_mysql( $text ) ) {
+			return false;
+		}
+
 		if ( isset( $this->ignored_string_occurences[ $this->filename ][ $text ] ) ) {
 
 			foreach ( $this->ignored_string_occurences[ $this->filename ][ $text ] as $line => $cur_func ) {
@@ -1471,6 +1475,45 @@ class WP_L10n_Validator {
 	//
 	// Protected Methods.
 	//
+
+	/**
+	 * Check if a string looks like MySQL.
+	 *
+	 * @since 0.2.0
+	 *
+	 * @param string $text The text to check for MySQL likeness.
+	 *
+	 * @return bool Whether the string looks like MySQL.
+	 */
+	protected function looks_like_mysql( $text ) {
+
+		static $mysql_keywords = array(
+			'ASC',
+			'COUNT',
+			'DESC',
+			'IN (',
+			'NOT',
+			'SELECT',
+			'WHERE',
+			'LIMIT',
+			'CHARACTER SET',
+			'DEFAULT',
+			'COLLATE',
+			'CREATE',
+			'TABLE',
+			'AND',
+			'BIGINT',
+		);
+
+		foreach ( $mysql_keywords as $keyword ) {
+
+			if ( false !== strpos( $text, $keyword ) ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
 
 	/**
 	 * Report some non-gettexted text.
