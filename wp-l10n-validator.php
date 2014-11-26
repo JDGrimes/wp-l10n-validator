@@ -1716,7 +1716,12 @@ class WP_L10n_Validator {
 	 */
 	protected static function save_json_file( $file, $data ) {
 
-		$json = json_encode( $data );
+		$options = null;
+		if ( defined( 'JSON_PRETTY_PRINT' ) ) {
+			$options = JSON_PRETTY_PRINT;
+		}
+
+		$json = json_encode( $data, $options );
 
 		if ( ! $json )
 			return false;
