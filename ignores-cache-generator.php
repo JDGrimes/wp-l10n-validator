@@ -57,7 +57,9 @@ class WP_L10n_Specific_Ignores_Generator extends WP_L10n_Validator {
 
 		$cached_ignores = parent::load_json_file( $file );
 
-		$ignores = array_merge( $cached_ignores, $this->ignores );
+		if ( is_array( $this->ignores ) ) {
+			$ignores = array_merge( $cached_ignores, $this->ignores );
+		}
 
 		return parent::save_json_file( $file, $ignores );
 	}
