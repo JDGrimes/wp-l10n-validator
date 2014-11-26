@@ -55,7 +55,11 @@ class WP_L10n_Specific_Ignores_Generator extends WP_L10n_Validator {
 				$file = $this->basedir . '/wp-l10n-validator-ignores.cache';
 		}
 
-		return parent::save_json_file( $file, $this->ignores );
+		$cached_ignores = parent::load_json_file( $file );
+
+		$ignores = array_merge( $cached_ignores, $this->ignores );
+
+		return parent::save_json_file( $file, $ignores );
 	}
 
 	//
