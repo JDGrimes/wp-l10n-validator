@@ -674,7 +674,24 @@ class WP_L10n_Validator {
 	 */
 	public function had_errors() {
 
-		return self::$errors;
+		// If the current file has errors we don't need to check the other files.
+		if ( self::$errors ) {
+			return true;
+		}
+
+		// Check the cache to see if there are errors recorded for the other files.
+		$errors = array_map(
+			function ( $file ) {
+				return $file['errors'];
+			}
+			, $this->cache
+		);
+
+		// Filter out any files where errors was false.
+		$errors = array_filter( $errors );
+
+		// If there are any elements left in the array, then there were errors.
+		return ! empty( $errors );
 	}
 
 	//
