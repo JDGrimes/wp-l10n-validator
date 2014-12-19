@@ -75,6 +75,7 @@ $parser->add_ignored_functions(
 		'wp_create_nonce'       => true,
 		'wp_enqueue_script'     => true,
 		'wp_enqueue_style'      => true,
+		'wp_kses'               => array( 2 ),
 		'wp_localize_script'    => array( 1, 2 ),
 		'wp_nonce_field'        => true,
 		'wp_nonce_url'          => true,
