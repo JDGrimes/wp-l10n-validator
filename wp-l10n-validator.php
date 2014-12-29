@@ -1519,6 +1519,10 @@ class WP_L10n_Validator {
 			'CREATE',
 			'TABLE',
 			'AND',
+			'LIKE',
+			'ORDER BY',
+			'CAST(',
+			'FROM',
 			'BIGINT',
 		);
 
