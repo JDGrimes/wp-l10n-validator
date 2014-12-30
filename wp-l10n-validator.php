@@ -1427,6 +1427,11 @@ class WP_L10n_Validator {
 		switch ( $text[0] ) {
 
 			case '<':
+				if ( '<%-' === substr( $text, 0, 3 ) && '%>' === substr( $text, -2, 2 ) ) {
+					return false;
+				}
+				// fallthru
+
 			case '"':
 			case "'":
 				switch ( substr( $text, -2, 2 ) ) {

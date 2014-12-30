@@ -25,4 +25,4 @@ $( 'a' ).addClass( 'link' );
 <p id="<?php echo $pid; ?>" class="test"></p>
 <img src="<?php echo $img_url; ?>" alt="" />
 <p id='<?php echo $pid; ?>' class='test'></p>
-<img src='<?php echo $img_url; ?>' alt='' />
+<img src='<?php echo $img_url; ?>' alt='<%- backbone %>' />
