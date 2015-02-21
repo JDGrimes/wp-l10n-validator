@@ -41,6 +41,7 @@ $parser->add_ignored_functions(
 		'get_post_type_archive_link' => true,
 		'get_site_transient'    => true,
 		'get_transient'         => true,
+		'get_user_by'           => true,
 		'get_user_meta'         => true,
 		'get_user_option'       => true,
 		'get_user_setting'      => array( 1 ),
