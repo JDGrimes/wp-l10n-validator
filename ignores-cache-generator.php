@@ -32,9 +32,30 @@ class WP_L10n_Specific_Ignores_Generator extends WP_L10n_Validator {
 	 */
 	private $ignores = array();
 
+	/**
+	 * The old ignores cache.
+	 *
+	 * @since 0.2.0
+	 *
+	 * @var array
+	 */
+	private $old_ignores = array();
+
 	//
 	// Public Methods.
 	//
+
+	/**
+	 * @since 0.2.0
+	 */
+	public function parse() {
+
+		// We do this so that the cache doesn't bloat.
+		$this->old_ignores = $this->ignored_string_occurrences;
+		$this->ignored_string_occurrences = array();
+
+		parent::parse();
+	}
 
 	/**
 	 * Cache the specific ignores to a file.
@@ -47,17 +68,14 @@ class WP_L10n_Specific_Ignores_Generator extends WP_L10n_Validator {
 	 */
 	public function write_cache( $file = '' ) {
 
-		if ( empty( $file ) ) {
-
-			if ( ! empty( self::$config['ignores-cache'] ) )
-				$file = self::resolve_path( self::$config['ignores-cache'] );
-			else
-				$file = $this->basedir . '/wp-l10n-validator-ignores.cache';
-		}
-
 		$ignores = $this->ignores;
+		$cached_ignores = $this->old_ignores;
 
-		$cached_ignores = parent::load_json_file( $file );
+		if ( empty( $file ) ) {
+			$file = parent::$config['ignores-cache'];
+		} else {
+			$cached_ignores = parent::load_json_file( $file );
+		}
 
 		if ( is_array( $cached_ignores ) ) {
 			$ignores = array_merge( $cached_ignores, $ignores );
