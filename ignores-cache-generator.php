@@ -127,12 +127,11 @@ class WP_L10n_Specific_Ignores_Generator extends WP_L10n_Validator {
 	 *
 	 * @since 0.1.0
 	 *
-	 * @param string $file The file that should have been called from the CLI.
-	 *
-	 * @return WP_L10n_Specific_Ignores_Generator|bool The parser instance or false.
+	 * @return WP_L10n_Specific_Ignores_Generator The parser instance.
 	 */
 	public static function cli() {
 
+		/** @var WP_L10n_Specific_Ignores_Generator $parser */
 		$parser = parent::cli();
 		$parser->write_cache();
 		return $parser;

@@ -59,7 +59,7 @@ class WP_L10n_Validator {
 	 *
 	 * @since 0.1.0
 	 *
-	 * @type sting $filename
+	 * @type string $filename
 	 */
 	protected $filename;
 
@@ -81,7 +81,7 @@ class WP_L10n_Validator {
 	 *       @type string $name The name of the function.
 	 *       @type string $type The type of function: l10n, ignored, unknown.
 	 *       @type bool   $args_started Whether the opening parentheses has been encountered.
-	 *       @type int    $arg_count The number of comma's encounted since the args started.
+	 *       @type int    $arg_count The number of comma's encountered since the args started.
 	 *       @type int    $parentheses The number of open parentheses. When this becomes 0, the function call has ended.
 	 * }
 	 */
@@ -260,16 +260,16 @@ class WP_L10n_Validator {
 	public $ignored_strings = array();
 
 	/**
-	 * Specific string occurances to ignore.
+	 * Specific string occurrences to ignore.
 	 *
 	 * @since 0.1.0
 	 *
-	 * @type array $ignored_string_occurences
+	 * @type array $ignored_string_occurrences
 	 */
-	public $ignored_string_occurences = array();
+	public $ignored_string_occurrences = array();
 
 	/**
-	 * Specific string occurance ignores line number tolerance.
+	 * Specific string occurrence ignores line number tolerance.
 	 *
 	 * @since 0.1.0
 	 *
@@ -361,7 +361,7 @@ class WP_L10n_Validator {
 		$ignores = self::load_json_file( self::resolve_path( self::$config['ignores-cache'] ) );
 
 		if ( $ignores )
-			$this->ignored_string_occurences += $ignores;
+			$this->ignored_string_occurrences += $ignores;
 
 		foreach ( (array) self::$config_callbacks as $callback ) {
 
@@ -415,8 +415,8 @@ class WP_L10n_Validator {
 
 		self::save_json_file( $this->cache_file, $this->cache );
 
-		if ( ! empty( $this->ignored_string_occurences ) )
-			self::save_json_file( $this->resolve_path( self::$config['ignores-cache'] ), $this->ignored_string_occurences );
+		if ( ! empty( $this->ignored_string_occurrences ) )
+			self::save_json_file( $this->resolve_path( self::$config['ignores-cache'] ), $this->ignored_string_occurrences );
 	}
 
 	/**
@@ -772,7 +772,7 @@ class WP_L10n_Validator {
 	 *
 	 * It attempts to do the following:
 	 * * Find untranslated strings in HTML.
-	 * * Find encapsed stringes that aren't being translated.
+	 * * Find encapsed strings that aren't being translated.
 	 * * Make sure all l10n function arguments are valid -
 	 * * * No variables where there should be a string.
 	 * * * No variables within strings.
@@ -917,7 +917,7 @@ class WP_L10n_Validator {
 						}
 					break; // T_STRING
 
-					// We're encoutering a language construct that we'll likely treat as an ignored function.
+					// We're encountering a language construct that we'll likely treat as an ignored function.
 					case T_ARRAY:
 					case T_ELSEIF:
 					case T_EMPTY:
@@ -1033,7 +1033,7 @@ class WP_L10n_Validator {
 
 					/*
 					 * These tokens will be accompanied by closing curly braces, but
-					 * we won't catch the opening brace below (becuase it is part of
+					 * we won't catch the opening brace below (because it is part of
 					 * these tokens) so we'll catch it here. Otherwise the parser
 					 * will think that the class declaration has ended before it has.
 					 */
@@ -1093,7 +1093,7 @@ class WP_L10n_Validator {
 
 						$this->cur_func['parentheses']--;
 
-						// If the parentheses have cancled out, the function has ended.
+						// If the parentheses have canceled out, the function has ended.
 						if ( $this->cur_func['parentheses'] == 0 ) {
 
 							if ( $this->cur_func && $this->cur_func['type'] == 'l10n' ) {
@@ -1253,7 +1253,7 @@ class WP_L10n_Validator {
 
 				/*
 				 * If we are currently in a function, add it to the stack. If the
-				 * arguments hadn't started yet, then it wasn't a real funtion
+				 * arguments hadn't started yet, then it wasn't a real function
 				 * call, so we don't need to add it to the stack.
 				 */
 				$this->func_stack[] = $this->cur_func;
@@ -1358,7 +1358,7 @@ class WP_L10n_Validator {
 			/*
 			 * There may be HTML in this.
 			 *
-			 * First we will search for any attrributes whose values should be
+			 * First we will search for any attributes whose values should be
 			 * gettexted, then we rip all of the attributes out.
 			 */
 
@@ -1408,7 +1408,7 @@ class WP_L10n_Validator {
 
 			/*
 			 * Now lets try to rip all of the HTML elements out and see if there is
-			 * anything meaningfull left.
+			 * anything meaningful left.
 			 */
 			$text = preg_replace( '~</?[a-zA-z]+[^>]*/?>?~', '', $text );
 		}
@@ -1469,9 +1469,9 @@ class WP_L10n_Validator {
 			return false;
 		}
 
-		if ( isset( $this->ignored_string_occurences[ $this->filename ][ $text ] ) ) {
+		if ( isset( $this->ignored_string_occurrences[ $this->filename ][ $text ] ) ) {
 
-			foreach ( $this->ignored_string_occurences[ $this->filename ][ $text ] as $line => $cur_func ) {
+			foreach ( $this->ignored_string_occurrences[ $this->filename ][ $text ] as $line => $cur_func ) {
 
 				if (
 					$line + $this->ignores_tolerance > $this->line_number
@@ -1481,8 +1481,8 @@ class WP_L10n_Validator {
 
 					if ( $line != $this->line_number ) {
 
-						$this->ignored_string_occurences[ $text ][ $this->line_number ] = $cur_func;
-						unset( $this->ignored_string_occurences[ $text ][ $line ] );
+						$this->ignored_string_occurrences[ $text ][ $this->line_number ] = $cur_func;
+						unset( $this->ignored_string_occurrences[ $text ][ $line ] );
 					}
 
 					return false;
@@ -1774,8 +1774,6 @@ class WP_L10n_Validator {
 	 *
 	 * @since 0.1.0
 	 *
-	 * @param string $file The file that should have been called from the CLI.
-	 *
 	 * @return WP_L10n_Validator The parser instance.
 	 */
 	public static function cli() {
@@ -1798,6 +1796,7 @@ class WP_L10n_Validator {
 
 			$class = get_called_class();
 
+			/* @var WP_L10n_Validator $parser  */
 			$parser = new $class( $args['basedir'], $args['textdomain'] );
 
 			switch ( $args['config'] ) {
@@ -1933,7 +1932,7 @@ class WP_L10n_Validator {
 			. "Validate all .php files in the current directory for proper gettexting.\n"
 			. "\nArguments:\n"
 			. "\tTEXTDOMAIN - The textdomain used in the project.\n"
-			. "\tCONFIG - Configuration to use. Corressponds to one of the directories\n"
+			. "\tCONFIG - Configuration to use. Corresponds to one of the directories\n"
 			. "\t\t in /config (wordpress by default).\n"
 			. "\nFlags:\n"
 			. "\t1 - Parse only one file at a time.\n"
