@@ -1481,8 +1481,8 @@ class WP_L10n_Validator {
 
 					if ( $line != $this->line_number ) {
 
-						$this->ignored_string_occurrences[ $text ][ $this->line_number ] = $cur_func;
-						unset( $this->ignored_string_occurrences[ $text ][ $line ] );
+						$this->ignored_string_occurrences[ $this->filename ][ $text ][ $this->line_number ] = $cur_func;
+						unset( $this->ignored_string_occurrences[ $this->filename ][ $text ][ $line ] );
 					}
 
 					return false;
