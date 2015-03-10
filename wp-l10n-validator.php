@@ -1529,6 +1529,7 @@ class WP_L10n_Validator {
 			'CAST(',
 			'FROM',
 			'BIGINT',
+			'JOIN',
 		);
 
 		foreach ( $mysql_keywords as $keyword ) {
