@@ -13,7 +13,7 @@ p {
 	color: #000;
 }
 </style>
-<h1>Catch me!</h2>
+<h1>Catch me!</h1>
 <p><?php echo 'bob'; ?></p>
 <p class="ignoreme"></p>
 <?php do_stuff(); ?>
