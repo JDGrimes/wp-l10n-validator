@@ -736,6 +736,41 @@ class WP_L10n_Validator {
 		return ! empty( $errors );
 	}
 
+	/**
+	 * Check if a string is ignored.
+	 *
+	 * @since 0.3.0
+	 *
+	 * @param string $string The string to check.
+	 *
+	 * @return bool Whether the string is ignored.
+	 */
+	public function is_ignored_string( $string ) {
+
+		if ( isset( $this->ignored_string_occurrences[ $this->filename ][ $string ] ) ) {
+
+			foreach ( $this->ignored_string_occurrences[ $this->filename ][ $string ] as $line => $cur_func ) {
+
+				if (
+					$line + $this->ignores_tolerance > $this->line_number
+					&& $line - $this->ignores_tolerance < $this->line_number
+					&& $this->cur_func == $cur_func
+				) {
+
+					if ( $line != $this->line_number ) {
+
+						$this->ignored_string_occurrences[ $this->filename ][ $string ][ $this->line_number ] = $cur_func;
+						unset( $this->ignored_string_occurrences[ $this->filename ][ $string ][ $line ] );
+					}
+
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
 	//
 	// Public Static Methods.
 	//
@@ -1511,25 +1546,8 @@ class WP_L10n_Validator {
 			return false;
 		}
 
-		if ( isset( $this->ignored_string_occurrences[ $this->filename ][ $text ] ) ) {
-
-			foreach ( $this->ignored_string_occurrences[ $this->filename ][ $text ] as $line => $cur_func ) {
-
-				if (
-					$line + $this->ignores_tolerance > $this->line_number
-					&& $line - $this->ignores_tolerance < $this->line_number
-					&& $this->cur_func == $cur_func
-				) {
-
-					if ( $line != $this->line_number ) {
-
-						$this->ignored_string_occurrences[ $this->filename ][ $text ][ $this->line_number ] = $cur_func;
-						unset( $this->ignored_string_occurrences[ $this->filename ][ $text ][ $line ] );
-					}
-
-					return false;
-				}
-			}
+		if ( $this->is_ignored_string( $text ) ) {
+			return false;
 		}
 
 		return $text;
