@@ -12,7 +12,7 @@
  * @link http://plugins.svn.wordpress.org/codestyling-localization/trunk/codestyling-localization.php Revision 778516 (~1.99.30)
  *
  * @package WP_L10n_Validator
- * @version 0.1.2-beta
+ * @version 0.2.0
  * @since   0.1.0
  * @author  J.D. Grimes <jdg@codesymphony.co>
  * @license GPLv2
@@ -99,7 +99,7 @@ class WP_L10n_Validator {
 	/**
 	 * The name of the current HTML attribute.
 	 *
-	 * @since 0.1.2
+	 * @since 0.2.0
 	 *
 	 * @type string $cur_attr
 	 */
@@ -152,7 +152,7 @@ class WP_L10n_Validator {
 	 * bracket of the function body is encountered it is set to 'braces', and will be
 	 * set back to false when the closing bracket is found.
 	 *
-	 * @since 0.1.2
+	 * @since 0.2.0
 	 *
 	 * @type bool|string $in_func_declaration
 	 */
@@ -198,7 +198,7 @@ class WP_L10n_Validator {
 	/**
 	 * Whether any errors have been found.
 	 *
-	 * @since 0.1.2
+	 * @since 0.2.0
 	 *
 	 * @type bool $errors
 	 */

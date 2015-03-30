@@ -29,7 +29,7 @@ class Class_Method_Name_Test extends WP_L10n_Validator_UnitTestCase {
 	 * Part of the test is checking that a method is ignored in a child class if it
 	 * is ignored in the parent class.
 	 *
-	 * @since 0.1.2
+	 * @since 0.2.0
 	 */
 	public static function configure_parser( $parser ) {
 

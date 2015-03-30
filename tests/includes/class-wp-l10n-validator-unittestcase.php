@@ -114,7 +114,7 @@ class WP_L10n_Validator_UnitTestCase extends PHPUnit_Framework_TestCase {
 	/**
 	 * Configure the parser.
 	 *
-	 * @since 0.1.2
+	 * @since 0.2.0
 	 */
 	public static function configure_parser( $parser ) {}
 
