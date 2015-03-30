@@ -302,7 +302,10 @@ class WP_L10n_Validator {
 	 *
 	 * @since 0.1.0
 	 *
-	 * @type array $cache
+	 * @type array $cache {
+	 *       @type string $config_signature The hash of the configuration used.
+	 *       @type array  $files            The files that were parsed.
+	 * }
 	 */
 	public $cache = array();
 
@@ -402,8 +405,37 @@ class WP_L10n_Validator {
 
 		$cache = self::load_json_file( $this->cache_file );
 
-		if ( $cache )
-			$this->cache = $cache;
+		if ( $cache ) {
+			// Back-compat.
+			if ( ! isset( $cache['files'] ) ) {
+				$this->cache['files'] = $cache;
+			} else {
+				$this->cache = $cache;
+			}
+		}
+	}
+
+	/**
+	 * Get the configuration signature for the cache.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @return string The config signature that can be checked against the cache.
+	 */
+	public function get_cache_signature() {
+
+		return md5(
+			serialize(
+				array(
+					$this->textdomains,
+					$this->l10n_functions,
+					$this->non_string_l10n_args,
+					$this->ignored_functions,
+					$this->ignored_atts,
+					$this->ignored_strings
+				)
+			)
+		);
 	}
 
 	/**
@@ -412,6 +444,8 @@ class WP_L10n_Validator {
 	 * @since 0.1.0
 	 */
 	public function save_cache() {
+
+		$this->cache['config_signature'] = $this->get_cache_signature();
 
 		self::save_json_file( $this->cache_file, $this->cache );
 
@@ -552,6 +586,14 @@ class WP_L10n_Validator {
 	 */
 	public function parse() {
 
+		// Invalidate the cache if the config signature is different.
+		if (
+			! isset( $this->cache['config_signature'] )
+		     || $this->cache['config_signature'] !== $this->get_cache_signature()
+		) {
+			$this->cache = array();
+		}
+
 		$base_length = strlen( $this->basedir );
 
 		foreach ( new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $this->basedir ) ) as $filename ) {
@@ -684,7 +726,7 @@ class WP_L10n_Validator {
 			function ( $file ) {
 				return $file['errors'];
 			}
-			, $this->cache
+			, $this->cache['files']
 		);
 
 		// Filter out any files where errors was false.
@@ -728,10 +770,10 @@ class WP_L10n_Validator {
 		$file_size = @filesize( $file );
 
 		if ( $file_size ) {
-			if ( isset( $this->cache[ $this->filename ]['size'] ) && $file_size != $this->cache[ $this->filename ]['size'] )
+			if ( isset( $this->cache['files'][ $this->filename ]['size'] ) && $file_size != $this->cache['files'][ $this->filename ]['size'] )
 				$check_hash = false;
 
-			$this->cache[ $this->filename ]['size'] = $file_size;
+			$this->cache['files'][ $this->filename ]['size'] = $file_size;
 		}
 
 		$content = file_get_contents( $file );
@@ -750,19 +792,19 @@ class WP_L10n_Validator {
 		 */
 		if (
 			$check_hash
-			&& isset( $this->cache[ $this->filename ]['hash'] )
-			&& $checksum == $this->cache[ $this->filename ]['hash']
-			&& isset( $this->cache[ $this->filename ]['errors'] )
-			&& ! $this->cache[ $this->filename ]['errors']
+			&& isset( $this->cache['files'][ $this->filename ]['hash'] )
+			&& $checksum == $this->cache['files'][ $this->filename ]['hash']
+			&& isset( $this->cache['files'][ $this->filename ]['errors'] )
+			&& ! $this->cache['files'][ $this->filename ]['errors']
 		) {
 			return false;
 		}
 
-		$this->cache[ $this->filename ]['hash'] = $checksum;
+		$this->cache['files'][ $this->filename ]['hash'] = $checksum;
 
 		$this->_parse_string( $content );
 
-		$this->cache[ $this->filename ]['errors'] = self::$errors;
+		$this->cache['files'][ $this->filename ]['errors'] = self::$errors;
 
 		return true;
 	}
