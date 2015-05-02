@@ -86,6 +86,7 @@ $parser->add_ignored_functions(
 		'wp_register_script'    => true,
 		'wp_register_style'     => true,
 		'wp_reset_vars'         => true,
+		'wp_safe_redirect'      => true,
 		'wp_schedule_event'     => array( 1, 2, 3 ),
 		'wp_verify_nonce'       => true,
 		// Instance calls.
