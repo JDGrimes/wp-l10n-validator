@@ -99,6 +99,7 @@ $parser->add_ignored_functions(
 		'$wpdb->get_results'         => true,
 		'$wpdb->get_var'             => true,
 		'$wpdb->get_col'             => true,
+		'$wpdb->get_col_charset'     => true,
 		// Static/parent method calls.
 		'File_Upload_Upgrader::__construct' => true,
 		'WP_Date_Query::__construct'        => true,
