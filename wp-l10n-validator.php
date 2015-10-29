@@ -1126,11 +1126,6 @@ class WP_L10n_Validator {
 									! $this->cur_func
 								||
 									$this->cur_func['type'] != 'ignored'
-								&& (
-										! isset( $this->ignored_functions[ $this->cur_func['name'] ][0] )
-									||
-										! in_array( $this->cur_func['arg_count'] + 1, $this->ignored_functions[ $this->cur_func['name'] ] )
-								)
 							) && ! (
 									 $brackets
 								|| (
@@ -1142,9 +1137,8 @@ class WP_L10n_Validator {
 						) {
 							/*
 							 * We aren't inside a function, or at least not in one
-							 * that we're supposed to be ignoring, and we aren't
-							 * supposed to ignore this particular function argument,
-							 * AND, this isn't an array key. I.e., listen up!
+							 * that we're supposed to be ignoring, AND, this isn't an
+							 *  array key. I.e., listen up!
 							 */
 
 							// Remove surrounding quotes, prepare for logging.
@@ -1513,10 +1507,24 @@ class WP_L10n_Validator {
 			$exited = true;
 		}
 
-		// If we've exited the original "function", make sure this one isn't ignored or l10n.
-		if ( $exited && $this->cur_func && ( $this->cur_func['type'] == 'ignored' || $this->cur_func['type'] == 'l10n' ) ) {
+		if ( $this->cur_func ) {
+			// If we've exited the original "function", bail if this one is ignored or l10n.
+			if (  $exited && $this->cur_func['type'] == 'ignored' || $this->cur_func['type'] == 'l10n' ) {
+				return false;
+			}
 
-			return false;
+			// Also bail if this particular argument is ignored.
+			if (
+					isset( $this->ignored_functions[ $this->cur_func['name'] ][0] )
+				&&
+					in_array(
+						$this->cur_func['arg_count'] + 1
+						, $this->ignored_functions[ $this->cur_func['name'] ]
+						, true
+					)
+			) {
+				return false;
+			}
 		}
 
 		if ( strpos( $text, '<' ) !== false ) {
