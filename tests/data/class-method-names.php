@@ -42,6 +42,25 @@ $wpdb->query( _debug_ );
 
 $query = new WP_Query( _debug_ );
 
-$func = function() {}
+$func = function() {};
 
 get_some_class()->method( _debug_ );
+
+interface ParentI {
+	public function parent_method( $var _debug_ );
+}
+
+interface ChildI extends ParentI {
+	public function ignored( $var = 'something' _debug_ );
+}
+
+interface AnotherI {}
+
+class Implementor implements ChildI, AnotherI {
+
+	public function parent_method( $var _debug_ ) {
+		$this->ignored( 'ignore me' _debug_ );
+	}
+
+	public function ignored( $var = 'something' _debug_ ) {}
+}

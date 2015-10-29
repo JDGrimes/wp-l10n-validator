@@ -133,16 +133,31 @@ class WP_L10n_Validator {
 	protected $in_new_class;
 
 	/**
-	 * The name of the current class (and possibly parent).
+	 * The name of the current class (and possibly parent and interfaces).
 	 *
 	 * @since 0.1.0
+	 * @since 0.3.0 The $implements key is now populated.
 	 *
 	 * @type array {
-	 *       @type string $self   The name of the class.
-	 *       @type string $parent The name the parent of the class (if one).
+	 *       @type string   $self       The name of the class.
+	 *       @type string   $parent     The name the parent of the class (if one).
+	 *       @type string[] $implements The names of the interfaces implemented by
+	 *                                  the class (if any).
 	 * }
 	 */
 	protected $in_class;
+
+	/**
+	 * The name of the current interface (and possibly parent).
+	 *
+	 * @since 0.3.0
+	 *
+	 * @type array {
+	 *       @type string $self   The name of the interface.
+	 *       @type string $parent The name the parent of the interface (if one).
+	 * }
+	 */
+	protected $in_interface;
 
 	/**
 	 * Whether we have just encountered a function declaration.
@@ -703,6 +718,7 @@ class WP_L10n_Validator {
 			'in_switch_case'      => $this->in_switch_case,
 			'in_new_class'        => $this->in_new_class,
 			'in_class'            => $this->in_class,
+			'in_interface'        => $this->in_interface,
 			'in_func_declaration' => $this->in_func_declaration,
 		);
 	}
@@ -763,6 +779,43 @@ class WP_L10n_Validator {
 						unset( $this->ignored_string_occurrences[ $this->filename ][ $string ][ $line ] );
 					}
 
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Check if a class method is ignored.
+	 *
+	 * @since 0.3.0
+	 *
+	 * @param string $function The full name of the method including the class name.
+	 *
+	 * @return bool Whether the method is ignored.
+	 */
+	function is_ignored_method( $function ) {
+
+		if ( strpos( $function, "{$this->in_class['self']}::" ) !== 0 ) {
+			return false;
+		}
+
+		$method = substr( $function, strlen( "{$this->in_class['self']}::" ) );
+
+		if (
+			! empty( $this->in_class['parent'] )
+			&& isset(
+				$this->ignored_functions["{$this->in_class['parent']}::{$method}"]
+			)
+		) {
+			return true;
+		}
+
+		if ( ! empty( $this->in_class['implements'] ) ) {
+			foreach ( $this->in_class['implements'] as $interface )  {
+				if ( isset( $this->ignored_functions["{$interface}::{$method}"] ) ) {
 					return true;
 				}
 			}
@@ -873,6 +926,7 @@ class WP_L10n_Validator {
 		$this->in_switch_case      = false;
 		$this->in_new_class        = false;
 		$this->in_class            = false;
+		$this->in_interface        = false;
 		$this->in_func_declaration = false;
 		$this->line_number         = 1;
 		$this->func_stack          = array();
@@ -883,7 +937,7 @@ class WP_L10n_Validator {
 
 		$func_dec_braces = false;
 
-		$in_extends = false;
+		$in_extends = $in_implements = false;
 
 		$tokens = token_get_all( $content );
 
@@ -966,10 +1020,29 @@ class WP_L10n_Validator {
 
 							$full_function = $this->in_class['self'] . '::' . $full_function;
 
+						} elseif ( true === $this->in_interface ) {
+
+							$this->in_interface = array( 'self' => $full_function );
+							break;
+
+						} elseif ( $this->in_interface && 'func_name' == $this->in_func_declaration ) {
+
+							$full_function = $this->in_interface['self'] . '::' . $full_function;
+
 						} elseif ( $in_extends ) {
 
-							$this->in_class['parent'] = $full_function;
+							if ( $this->in_class ) {
+								$this->in_class['parent'] = $full_function;
+							} elseif ( $this->in_interface ) {
+								$this->in_interface['parent'] = $full_function;
+							}
+
 							$in_extends = false;
+							break;
+
+						} elseif ( $in_implements ) {
+
+							$this->in_class['implements'][] = $full_function;
 							break;
 						}
 
@@ -1098,6 +1171,10 @@ class WP_L10n_Validator {
 						$this->in_class = true;
 					break;
 
+					case T_INTERFACE:
+						$this->in_interface = true;
+					break;
+
 					case T_FUNCTION:
 						if ( $this->in_func_declaration != 'braces' ) {
 							$this->in_func_declaration = 'func_name';
@@ -1106,6 +1183,10 @@ class WP_L10n_Validator {
 
 					case T_EXTENDS:
 						$in_extends = true;
+					break;
+
+					case T_IMPLEMENTS:
+						$in_implements = true;
 					break;
 
 					/*
@@ -1192,6 +1273,10 @@ class WP_L10n_Validator {
 
 							$this->_exit_function();
 						}
+
+						if ( $this->in_interface && 'func_name' == $this->in_func_declaration ) {
+							$this->in_func_declaration = $func_dec_braces = false;
+						}
 					break;
 
 					// Keep track of brackets so we can ignore sting array keys.
@@ -1214,6 +1299,14 @@ class WP_L10n_Validator {
 
 							$braces++;
 
+							if ( 1 === $braces ) {
+								$in_implements = false;
+							}
+
+						} elseif ( $this->in_interface ) {
+
+							$braces++;
+
 						} else {
 
 							if ( 'func_name' === $this->in_func_declaration ) {
@@ -1231,6 +1324,12 @@ class WP_L10n_Validator {
 
 							if ( 'braces' == $this->in_func_declaration && $braces === $func_dec_braces ) {
 								$this->in_func_declaration = $func_dec_braces = false;
+							}
+
+						} elseif ( $this->in_interface ) {
+
+							if ( 0 == --$braces ) {
+								$this->in_interface = false;
 							}
 						}
 					break;
@@ -1296,19 +1395,9 @@ class WP_L10n_Validator {
 		if (
 				$type != 'ignored'
 			&&
-				! empty( $this->in_class['parent'] )
+			    $this->in_class
 			&&
-			 	strpos( $function, "{$this->in_class['self']}::" ) == 0
-			&&
-				isset(
-					$this->ignored_functions[
-						str_replace(
-							"{$this->in_class['self']}::"
-							, "{$this->in_class['parent']}::"
-							, $function
-						)
-					]
-				)
+				$this->is_ignored_method( $function )
 		) {
 			$type = 'ignored';
 		}
@@ -1705,7 +1794,7 @@ class WP_L10n_Validator {
 			}
 		}
 
-		$in_class = '';
+		$in_class = $in_interface = '';
 
 		if ( $this->in_class ) {
 
@@ -1714,11 +1803,35 @@ class WP_L10n_Validator {
 			if ( isset( $this->in_class['self'] ) ) {
 
 				$in_class .= $this->in_class['self'];
-				$in_class .= ( isset( $this->in_class['parent'] ) ) ? '(parent: ' . $this->in_class['parent'] . ')' : '';
+
+				if ( isset( $this->in_class['parent'] ) ) {
+					$in_class .= '(parent: ' . $this->in_class['parent'] . ')';
+				}
+
+				if ( isset( $this->in_class['implements'] ) ) {
+					$in_class .= '(implements: ' . implode( ', ', $this->in_class['implements'] ) . ')';
+				}
 
 			} else {
 
 				$in_class .= '-entering-';
+			}
+
+		} elseif ( $this->in_interface ) {
+
+			$in_interface .= "\n\t In interface: ";
+
+			if ( isset( $this->in_interface['self'] ) ) {
+
+				$in_interface .= $this->in_interface['self'];
+
+				if ( isset( $this->in_interface['parent'] ) ) {
+					$in_interface .= '(parent: ' . $this->in_interface['parent'] . ')';
+				}
+
+			} else {
+
+				$in_interface .= '-entering-';
 			}
 		}
 
@@ -1729,6 +1842,7 @@ class WP_L10n_Validator {
 			. "\n\t In new class: " . ( $this->in_new_class ? 'yes' : 'no' )
 			. "\n\t In function declaration: " . ( $this->in_func_declaration ? $this->in_func_declaration : 'no' )
 			. $in_class
+			. $in_interface
 			. $func_stack
 		);
 	}

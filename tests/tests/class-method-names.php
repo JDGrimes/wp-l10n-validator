@@ -33,7 +33,12 @@ class Class_Method_Name_Test extends WP_L10n_Validator_UnitTestCase {
 	 */
 	public static function configure_parser( $parser ) {
 
-		$parser->add_ignored_functions( array( 'IMHO::ignored' => true ) );
+		$parser->add_ignored_functions(
+			array(
+				'IMHO::ignored' => true,
+				'ChildI::ignored' => true,
+			)
+		);
 	}
 
 	/**
@@ -54,6 +59,11 @@ class Class_Method_Name_Test extends WP_L10n_Validator_UnitTestCase {
 			'$wpdb->query',
 			'WP_Query::__construct',
 			'(unknown)->method',
+			'ParentI::parent_method',
+			'ChildI::ignored',
+			'Implementor::parent_method',
+			'Implementor::ignored',
+			'Implementor::ignored',
 		);
 
 		foreach ( $expected as $key => $function_name ) {
