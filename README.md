@@ -100,7 +100,9 @@ These are the options that you can specify in the the JSON config file:
    a class constructor (`My_Class::__construct`) will ignore `new My_Class()`. Calls
    within a class to `parent::method()` will be mapped to the class that is specified
    in the `extends` statement. If a method is being ignored in a parent class, it
-   will also be ignored in child classes as well.
+   will also be ignored in child classes as well. If a method is being ignored in an
+   interface, all classes that implement that interface will have that method ignored
+   as well (since 0.3.0).
  * `ignored-properties` - (0.3.0+) An associative array of class properties to ignore.
    The values are currently just expected to be `true`. To ignore any strings in the
    default value for a property, add it like this: `My_Class::$my_property`. This
