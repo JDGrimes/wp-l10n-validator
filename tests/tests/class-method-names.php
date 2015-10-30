@@ -39,6 +39,12 @@ class Class_Method_Name_Test extends WP_L10n_Validator_UnitTestCase {
 				'ChildI::ignored' => true,
 			)
 		);
+
+		$parser->add_ignored_properties(
+			array(
+				'IMHO::$ignored' => true,
+			)
+		);
 	}
 
 	/**
@@ -49,6 +55,13 @@ class Class_Method_Name_Test extends WP_L10n_Validator_UnitTestCase {
 	public function test_class_method_names() {
 
 		$expected = array(
+			'IMHO::$ignored',
+			false,
+			'FWIW::$var',
+			'FWIW::$public',
+			'FWIW::$protected',
+			'FWIW::$private',
+			'FWIW::$ignored',
 			'FWIW::private_thoughts',
 			'FWIW::what_i_think',
 			'inner_func',
@@ -66,12 +79,31 @@ class Class_Method_Name_Test extends WP_L10n_Validator_UnitTestCase {
 			'Implementor::ignored',
 		);
 
-		foreach ( $expected as $key => $function_name ) {
+		foreach ( $expected as $key => $name ) {
 
-			if ( isset( parent::$debugs[ $key ]['cur_func']['name'] ) )
-				$this->assertEquals( $function_name, parent::$debugs[ $key ]['cur_func']['name'] );
-			else
+			if ( ! $name ) {
+
+				$this->assertEmpty( parent::$debugs[ $key ]['cur_func'] );
+				$this->assertEmpty( parent::$debugs[ $key ]['cur_prop'] );
+
+			} elseif ( strpos( $name, '::$' ) ) {
+
+				$this->assertEquals(
+					$name
+					, parent::$debugs[ $key ]['in_class']['self']
+						. '::' . parent::$debugs[ $key ]['cur_prop']
+				);
+
+			} elseif ( isset( parent::$debugs[ $key ]['cur_func']['name'] ) ) {
+
+				$this->assertEquals(
+					$name
+					, parent::$debugs[ $key ]['cur_func']['name']
+				);
+
+			} else {
 				$this->fail( 'Not enough debug results were found.' );
+			}
 
 			unset( parent::$debugs[ $key ] );
 		}

@@ -11,7 +11,17 @@ function some_func() {
 	// See #5
 }
 
+class IMHO {
+	protected $ignored = 'imho' _debug_ ; _debug_
+}
+
 class FWIW extends IMHO {
+
+	var $var _debug_;
+	public $public _debug_;
+	protected $protected _debug_;
+	private $private _debug_;
+	public $ignored = 'fwiw' _debug_;
 
 	private function private_thoughts( _debug_ );
 

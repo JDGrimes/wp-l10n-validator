@@ -4,6 +4,9 @@
 	"ignored-functions": {
 		"func_to_ignore":true
 	},
+	"ignored-properties": {
+		"AClass::$ignored": true
+	},
 	"ignored-strings": [
 		"Dlrow olleh"
 	]

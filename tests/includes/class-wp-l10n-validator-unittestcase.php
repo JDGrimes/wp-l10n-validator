@@ -74,9 +74,11 @@ class WP_L10n_Validator_UnitTestCase extends PHPUnit_Framework_TestCase {
 	 *
 	 * Parses the file that is used in the test, and sets up the $erors member var.
 	 *
-	 * @since 0.1.0
+	 * @since 0.3.0
 	 */
-	public static function setUpBeforeClass() {
+	public function setUp() {
+
+		parent::setUp();
 
 		$parser = new Test_L10n_Validator( WP_L10N_VALIDATOR_DIR . '/tests/data/', 'wp-l10n-validator-tests' );
 
@@ -97,13 +99,13 @@ class WP_L10n_Validator_UnitTestCase extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * Tear down after the class.
+	 * Check for unexpected errors after each test.
 	 *
-	 * Checks that all unexpected error occurred.
-	 *
-	 * @since 0.1.0
+	 * @since 0.3.0
 	 */
-	public static function tearDownAfterClass() {
+	public function assertPostConditions() {
+
+		parent::assertPostConditions();
 
 		self::check_for_unexpected_errors();
 
@@ -115,6 +117,8 @@ class WP_L10n_Validator_UnitTestCase extends PHPUnit_Framework_TestCase {
 	 * Configure the parser.
 	 *
 	 * @since 0.2.0
+	 *
+	 * @param Test_L10n_Validator $parser The parser object.
 	 */
 	public static function configure_parser( $parser ) {}
 
@@ -136,36 +140,16 @@ class WP_L10n_Validator_UnitTestCase extends PHPUnit_Framework_TestCase {
 	 *
 	 * @since 0.1.0
 	 */
-	private static function check_for_unexpected_errors() {
-
-		$unexpected_errors = array();
-		if ( self::$errors == self::$expected_errors )
-			return;
+	protected function check_for_unexpected_errors() {
 
 		foreach ( self::$errors as $type => $errors ) {
+			if ( ! empty( $errors ) ) {
+				if ( ! isset( self::$expected_errors[ $type ] ) ) {
+					self::fail( "\n\nSome unexpected errors occurred: " . print_r( $errors, true ) );
+				}
 
-			if ( empty( $errors ) )
-				continue;
-
-			if ( ! isset( self::$expected_errors[ $type ] ) ) {
-
-				$unexpected_errors[ $type ] = $errors;
-				continue;
+				$this->assertEquals( self::$expected_errors[ $type ], $errors );
 			}
-
-			if ( $errors == self::$expected_errors[ $type ] )
-				continue;
-
-			foreach ( $errors as $error ) {
-
-				if ( array_search( $error, self::$expected_errors[ $type ] ) === false )
-					$unexpected_errors[ $type ][] = $error;
-			}
-		}
-
-		if ( count( $unexpected_errors ) > 0 ) {
-
-			self::fail( "\n\nSome unexpected errors occured: " . print_r( $unexpected_errors, true ) );
 		}
 	}
 
@@ -243,7 +227,7 @@ class WP_L10n_Validator_UnitTestCase extends PHPUnit_Framework_TestCase {
 	 *
 	 * @param string $arg_number The number of the argument that was invalid.
 	 * @param string $function   The function with the invalid arg.
-	 * @parma string $line       The line number.
+	 * @param string $line       The line number.
 	 * @param string $message    An optional message.
 	 *
 	 * @throws PHPUnit_Framework_AssertionFailedError

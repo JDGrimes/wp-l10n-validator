@@ -9,8 +9,11 @@
 		"my_plugin_do_something":true,
 		"my_plugin_do_this":[1, 2],
 		"my_plugin_do_that":[1, 3, 4],
-		"My_Plugim::do_stuff":true,
+		"My_Plugin::do_stuff":true,
 		"$my_plugin->add_foo":true
+	},
+	"ignored-properties": {
+		"My_Plugin::$slug":true
 	},
 	"ignored-strings": [
 		"SELECT COUNT(*)",
