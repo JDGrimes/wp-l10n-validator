@@ -37,3 +37,18 @@ $file = 'file/to/ignore.php';
 $path = '/includes';
 $other_path = 'src/includes/';
 $maybe = 'and/or';
+
+// This was giving an error for the '-' in the first arg, even though the first arg
+// was supposed to be ignored.
+add_meta_box(
+	"{$this->current_points_type}-{$slug}"
+	, $ignored->get_title()
+	, array( $this, 'display_event_meta_box' )
+	, $this->id
+	, 'events'
+	, 'default'
+	, array(
+		'points_type' => $this->current_points_type,
+		'slug'        => $slug,
+	)
+);

@@ -12,7 +12,7 @@
  * @link http://plugins.svn.wordpress.org/codestyling-localization/trunk/codestyling-localization.php Revision 778516 (~1.99.30)
  *
  * @package WP_L10n_Validator
- * @version 0.2.0
+ * @version 0.3.0
  * @since   0.1.0
  * @author  J.D. Grimes <jdg@codesymphony.co>
  * @license GPLv2
@@ -97,6 +97,15 @@ class WP_L10n_Validator {
 	protected $args_started;
 
 	/**
+	 * The name of the current class property.
+	 *
+	 * @since 0.3.0
+	 *
+	 * @type string $cur_prop
+	 */
+	protected $cur_prop;
+
+	/**
 	 * The name of the current HTML attribute.
 	 *
 	 * @since 0.2.0
@@ -133,16 +142,31 @@ class WP_L10n_Validator {
 	protected $in_new_class;
 
 	/**
-	 * The name of the current class (and possibly parent).
+	 * The name of the current class (and possibly parent and interfaces).
 	 *
 	 * @since 0.1.0
+	 * @since 0.3.0 The $implements key is now populated.
 	 *
 	 * @type array {
-	 *       @type string $self   The name of the class.
-	 *       @type string $parent The name the parent of the class (if one).
+	 *       @type string   $self       The name of the class.
+	 *       @type string   $parent     The name the parent of the class (if one).
+	 *       @type string[] $implements The names of the interfaces implemented by
+	 *                                  the class (if any).
 	 * }
 	 */
 	protected $in_class;
+
+	/**
+	 * The name of the current interface (and possibly parent).
+	 *
+	 * @since 0.3.0
+	 *
+	 * @type array {
+	 *       @type string $self   The name of the interface.
+	 *       @type string $parent The name the parent of the interface (if one).
+	 * }
+	 */
+	protected $in_interface;
 
 	/**
 	 * Whether we have just encountered a function declaration.
@@ -240,6 +264,15 @@ class WP_L10n_Validator {
 	 * @type array $ignored_functions
 	 */
 	public $ignored_functions = array();
+
+	/**
+	 * Class properties whose values should be ignored.
+	 *
+	 * @since 0.3.0
+	 *
+	 * @type array $ignored_properties
+	 */
+	public $ignored_properties = array();
 
 	/**
 	 * HTML attributes whose values to ignore.
@@ -431,6 +464,7 @@ class WP_L10n_Validator {
 					$this->l10n_functions,
 					$this->non_string_l10n_args,
 					$this->ignored_functions,
+					$this->ignored_properties,
 					$this->ignored_atts,
 					$this->ignored_strings
 				)
@@ -524,6 +558,50 @@ class WP_L10n_Validator {
 	public function remove_ignored_functions( array $functions ) {
 
 		$this->ignored_functions = array_diff( $this->ignored_functions, array_flip( $functions ) );
+	}
+
+	/**
+	 * Add to the list of class properties to ignore.
+	 *
+	 * Properties are expected in this format: Class_Name::$property_name.
+	 *
+	 * @since 0.3.0
+	 *
+	 * @param array $properties The names of the properties to add.
+	 */
+	public function add_ignored_properties( array $properties ) {
+
+		$this->ignored_properties += $properties;
+	}
+
+	/**
+	 * Update the list of class properties to ignore.
+	 *
+	 * @since 0.3.0
+	 *
+	 * @param array $properties The names of the properties to add/update.
+	 */
+	public function update_ignored_properties( array $properties ) {
+
+		$this->ignored_properties = array_merge(
+			$this->ignored_properties
+			, $properties
+		);
+	}
+
+	/**
+	 * Remove class properties from the ignored list.
+	 *
+	 * @since 0.3.0
+	 *
+	 * @param array $properties The names of the properties to remove.
+	 */
+	public function remove_ignored_properties( array $properties ) {
+
+		$this->ignored_properties = array_diff(
+			$this->ignored_properties
+			, array_flip( $properties )
+		);
 	}
 
 	/**
@@ -698,11 +776,13 @@ class WP_L10n_Validator {
 			'line'                => $this->line_number,
 			'cur_func'            => $this->cur_func,
 			'cur_attr'            => $this->cur_attr,
+			'cur_prop'            => $this->cur_prop,
 			'func_stack'          => $this->func_stack,
 			'in_include'          => $this->in_include,
 			'in_switch_case'      => $this->in_switch_case,
 			'in_new_class'        => $this->in_new_class,
 			'in_class'            => $this->in_class,
+			'in_interface'        => $this->in_interface,
 			'in_func_declaration' => $this->in_func_declaration,
 		);
 	}
@@ -734,6 +814,78 @@ class WP_L10n_Validator {
 
 		// If there are any elements left in the array, then there were errors.
 		return ! empty( $errors );
+	}
+
+	/**
+	 * Check if a string is ignored.
+	 *
+	 * @since 0.3.0
+	 *
+	 * @param string $string The string to check.
+	 *
+	 * @return bool Whether the string is ignored.
+	 */
+	public function is_ignored_string( $string ) {
+
+		if ( isset( $this->ignored_string_occurrences[ $this->filename ][ $string ] ) ) {
+
+			foreach ( $this->ignored_string_occurrences[ $this->filename ][ $string ] as $line => $cur_func ) {
+
+				if (
+					$line + $this->ignores_tolerance > $this->line_number
+					&& $line - $this->ignores_tolerance < $this->line_number
+					&& $this->cur_func == $cur_func
+				) {
+
+					if ( $line != $this->line_number ) {
+
+						$this->ignored_string_occurrences[ $this->filename ][ $string ][ $this->line_number ] = $cur_func;
+						unset( $this->ignored_string_occurrences[ $this->filename ][ $string ][ $line ] );
+					}
+
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Check if a class method is ignored.
+	 *
+	 * @since 0.3.0
+	 *
+	 * @param string $function The full name of the method including the class name.
+	 *
+	 * @return bool Whether the method is ignored.
+	 */
+	function is_ignored_method( $function ) {
+
+		if ( strpos( $function, "{$this->in_class['self']}::" ) !== 0 ) {
+			return false;
+		}
+
+		$method = substr( $function, strlen( "{$this->in_class['self']}::" ) );
+
+		if (
+			! empty( $this->in_class['parent'] )
+			&& isset(
+				$this->ignored_functions["{$this->in_class['parent']}::{$method}"]
+			)
+		) {
+			return true;
+		}
+
+		if ( ! empty( $this->in_class['implements'] ) ) {
+			foreach ( $this->in_class['implements'] as $interface )  {
+				if ( isset( $this->ignored_functions["{$interface}::{$method}"] ) ) {
+					return true;
+				}
+			}
+		}
+
+		return false;
 	}
 
 	//
@@ -838,6 +990,7 @@ class WP_L10n_Validator {
 		$this->in_switch_case      = false;
 		$this->in_new_class        = false;
 		$this->in_class            = false;
+		$this->in_interface        = false;
 		$this->in_func_declaration = false;
 		$this->line_number         = 1;
 		$this->func_stack          = array();
@@ -848,7 +1001,7 @@ class WP_L10n_Validator {
 
 		$func_dec_braces = false;
 
-		$in_extends = false;
+		$in_extends = $in_implements = $in_property = $maybe_in_property = false;
 
 		$tokens = token_get_all( $content );
 
@@ -931,10 +1084,29 @@ class WP_L10n_Validator {
 
 							$full_function = $this->in_class['self'] . '::' . $full_function;
 
+						} elseif ( true === $this->in_interface ) {
+
+							$this->in_interface = array( 'self' => $full_function );
+							break;
+
+						} elseif ( $this->in_interface && 'func_name' == $this->in_func_declaration ) {
+
+							$full_function = $this->in_interface['self'] . '::' . $full_function;
+
 						} elseif ( $in_extends ) {
 
-							$this->in_class['parent'] = $full_function;
+							if ( $this->in_class ) {
+								$this->in_class['parent'] = $full_function;
+							} elseif ( $this->in_interface ) {
+								$this->in_interface['parent'] = $full_function;
+							}
+
 							$in_extends = false;
+							break;
+
+						} elseif ( $in_implements ) {
+
+							$this->in_class['implements'][] = $full_function;
 							break;
 						}
 
@@ -1013,31 +1185,73 @@ class WP_L10n_Validator {
 									$this->report_unexpected_textdomain( $textdomain );
 							}
 
-						} elseif (
-							(
-									! $this->cur_func
-								||
-									$this->cur_func['type'] != 'ignored'
-								&& (
-										! isset( $this->ignored_functions[ $this->cur_func['name'] ][0] )
-									||
-										! in_array( $this->cur_func['arg_count'] + 1, $this->ignored_functions[ $this->cur_func['name'] ] )
-								)
-							) && ! (
+						} elseif ( ! $this->cur_func || $this->cur_func['type'] !== 'ignored' ) {
+
+							/*
+							 * We aren't inside a function, or at least not in one
+							 * that we're supposed to be ignoring. It's probable that
+							 * this string should really be gettexted.
+							 */
+
+							// Bail if this is just an array key.
+							if (
 									 $brackets
 								|| (
 										isset( $tokens[ $index + 2 ][0] )
 									&&
 										T_DOUBLE_ARROW == $tokens[ $index + 2 ][0]
 								)
-							)
-						) {
-							/*
-							 * We aren't inside a function, or at least not in one
-							 * that we're supposed to be ignoring, and we aren't
-							 * supposed to ignore this particular function argument,
-							 * AND, this isn't an array key. I.e., listen up!
-							 */
+							) {
+								break;
+							}
+
+							// Bail if this is an ignored property.
+							if ( $in_property === 'assignment' ) {
+
+								if ( ! empty( $this->ignored_properties["{$this->in_class['self']}::{$this->cur_prop}"] ) ) {
+									break;
+								}
+
+								if (
+										! empty( $this->in_class['parent'] )
+									&&
+										! empty(
+											$this->ignored_properties["{$this->in_class['parent']}::{$this->cur_prop}"]
+										)
+								) {
+									break;
+								}
+							}
+
+							$exited = false;
+
+							if ( $this->cur_func && ! $this->args_started ) {
+
+								// If the arguments hadn't started, this wasn't a real function.
+								$this->_exit_function( true );
+
+								$exited = true;
+							}
+
+							if ( $this->cur_func ) {
+								// If we've exited the original "function", bail if this one is ignored or l10n.
+								if ( $exited && $this->cur_func['type'] == 'ignored' || $this->cur_func['type'] == 'l10n' ) {
+									break;
+								}
+
+								// Also bail if this particular argument is ignored.
+								if (
+									isset( $this->ignored_functions[ $this->cur_func['name'] ][0] )
+									&&
+									in_array(
+										$this->cur_func['arg_count'] + 1
+										, $this->ignored_functions[ $this->cur_func['name'] ]
+										, true
+									)
+								) {
+									break;
+								}
+							}
 
 							// Remove surrounding quotes, prepare for logging.
 							$non_gettext = $this->prepare_non_gettext( substr( $text, 1, strlen( $text ) - 2 ) );
@@ -1063,14 +1277,26 @@ class WP_L10n_Validator {
 						$this->in_class = true;
 					break;
 
+					case T_INTERFACE:
+						$this->in_interface = true;
+					break;
+
 					case T_FUNCTION:
 						if ( $this->in_func_declaration != 'braces' ) {
 							$this->in_func_declaration = 'func_name';
+						}
+
+						if ( $maybe_in_property ) {
+							$maybe_in_property = false;
 						}
 					break;
 
 					case T_EXTENDS:
 						$in_extends = true;
+					break;
+
+					case T_IMPLEMENTS:
+						$in_implements = true;
 					break;
 
 					/*
@@ -1089,6 +1315,27 @@ class WP_L10n_Validator {
 					case T_WHITESPACE:
 					case T_COMMENT:
 					case T_DOC_COMMENT: break;
+
+					case T_VAR:
+						$in_property = 'variable';
+						break;
+
+					case T_PUBLIC:
+					case T_PROTECTED:
+					case T_PRIVATE:
+						$maybe_in_property = true;
+						break;
+
+					case T_VARIABLE:
+						if ( $in_property === 'variable' || $maybe_in_property ) {
+
+							$this->cur_prop = $text;
+							$in_property = 'assignment';
+							$maybe_in_property = false;
+
+							break;
+						}
+					// fallthru
 
 					default:
 						if ( $this->cur_func && $this->cur_func['type'] == 'l10n' && ! isset( $this->non_string_l10n_args[ $this->cur_func['arg_count'] ][ $this->cur_func['name'] ] ) ) {
@@ -1157,6 +1404,10 @@ class WP_L10n_Validator {
 
 							$this->_exit_function();
 						}
+
+						if ( $this->in_interface && 'func_name' == $this->in_func_declaration ) {
+							$this->in_func_declaration = $func_dec_braces = false;
+						}
 					break;
 
 					// Keep track of brackets so we can ignore sting array keys.
@@ -1179,6 +1430,14 @@ class WP_L10n_Validator {
 
 							$braces++;
 
+							if ( 1 === $braces ) {
+								$in_implements = false;
+							}
+
+						} elseif ( $this->in_interface ) {
+
+							$braces++;
+
 						} else {
 
 							if ( 'func_name' === $this->in_func_declaration ) {
@@ -1197,12 +1456,19 @@ class WP_L10n_Validator {
 							if ( 'braces' == $this->in_func_declaration && $braces === $func_dec_braces ) {
 								$this->in_func_declaration = $func_dec_braces = false;
 							}
+
+						} elseif ( $this->in_interface ) {
+
+							if ( 0 == --$braces ) {
+								$this->in_interface = false;
+							}
 						}
 					break;
 
 					case ';':
 						$this->_exit_function();
 						$this->in_include = false;
+						$this->cur_prop = $in_property = $maybe_in_property = false;
 					// fallthru
 
 					case ':':
@@ -1261,19 +1527,9 @@ class WP_L10n_Validator {
 		if (
 				$type != 'ignored'
 			&&
-				! empty( $this->in_class['parent'] )
+			    $this->in_class
 			&&
-			 	strpos( $function, "{$this->in_class['self']}::" ) == 0
-			&&
-				isset(
-					$this->ignored_functions[
-						str_replace(
-							"{$this->in_class['self']}::"
-							, "{$this->in_class['parent']}::"
-							, $function
-						)
-					]
-				)
+				$this->is_ignored_method( $function )
 		) {
 			$type = 'ignored';
 		}
@@ -1378,22 +1634,6 @@ class WP_L10n_Validator {
 	 * @return string|bool The text to log, or false if the string should be ignored.
 	 */
 	private function prepare_non_gettext( $text ) {
-
-		$exited = false;
-
-		if ( $this->cur_func && ! $this->args_started ) {
-
-			// If the arguments hadn't started, this wasn't a real function.
-			$this->_exit_function( true );
-
-			$exited = true;
-		}
-
-		// If we've exited the original "function", make sure this one isn't ignored or l10n.
-		if ( $exited && $this->cur_func && ( $this->cur_func['type'] == 'ignored' || $this->cur_func['type'] == 'l10n' ) ) {
-
-			return false;
-		}
 
 		if ( strpos( $text, '<' ) !== false ) {
 
@@ -1511,25 +1751,8 @@ class WP_L10n_Validator {
 			return false;
 		}
 
-		if ( isset( $this->ignored_string_occurrences[ $this->filename ][ $text ] ) ) {
-
-			foreach ( $this->ignored_string_occurrences[ $this->filename ][ $text ] as $line => $cur_func ) {
-
-				if (
-					$line + $this->ignores_tolerance > $this->line_number
-					&& $line - $this->ignores_tolerance < $this->line_number
-					&& $this->cur_func == $cur_func
-				) {
-
-					if ( $line != $this->line_number ) {
-
-						$this->ignored_string_occurrences[ $this->filename ][ $text ][ $this->line_number ] = $cur_func;
-						unset( $this->ignored_string_occurrences[ $this->filename ][ $text ][ $line ] );
-					}
-
-					return false;
-				}
-			}
+		if ( $this->is_ignored_string( $text ) ) {
+			return false;
 		}
 
 		return $text;
@@ -1595,6 +1818,10 @@ class WP_L10n_Validator {
 
 		$extra = '';
 
+		if ( $this->cur_attr ) {
+			$extra .= " {$this->cur_attr}=''";
+		}
+
 		if ( $this->cur_func ) {
 
 			$extra = " {$this->cur_func['name']}( " . ( $this->cur_func['arg_count'] + 1 ) . " )";
@@ -1602,11 +1829,12 @@ class WP_L10n_Validator {
 			foreach ( $this->func_stack as $func ) {
 
 				$extra = " {$func['name']}( " . ( $func['arg_count'] + 1 ) . "{$extra} )";
+
 			}
+		}
 
-		} elseif ( $this->cur_attr ) {
-
-			$extra = " {$this->cur_attr}=''";
+		if ( $this->cur_prop ) {
+			$extra = " {$this->in_class['self']}::{$this->cur_prop}{$extra}";
 		}
 
 		$this->error( "{$this->filename}#{$this->line_number}{$extra}: Non gettexted string '{$text}'" );
@@ -1687,7 +1915,7 @@ class WP_L10n_Validator {
 			}
 		}
 
-		$in_class = '';
+		$in_class = $in_interface = '';
 
 		if ( $this->in_class ) {
 
@@ -1696,11 +1924,35 @@ class WP_L10n_Validator {
 			if ( isset( $this->in_class['self'] ) ) {
 
 				$in_class .= $this->in_class['self'];
-				$in_class .= ( isset( $this->in_class['parent'] ) ) ? '(parent: ' . $this->in_class['parent'] . ')' : '';
+
+				if ( isset( $this->in_class['parent'] ) ) {
+					$in_class .= '(parent: ' . $this->in_class['parent'] . ')';
+				}
+
+				if ( isset( $this->in_class['implements'] ) ) {
+					$in_class .= '(implements: ' . implode( ', ', $this->in_class['implements'] ) . ')';
+				}
 
 			} else {
 
 				$in_class .= '-entering-';
+			}
+
+		} elseif ( $this->in_interface ) {
+
+			$in_interface .= "\n\t In interface: ";
+
+			if ( isset( $this->in_interface['self'] ) ) {
+
+				$in_interface .= $this->in_interface['self'];
+
+				if ( isset( $this->in_interface['parent'] ) ) {
+					$in_interface .= '(parent: ' . $this->in_interface['parent'] . ')';
+				}
+
+			} else {
+
+				$in_interface .= '-entering-';
 			}
 		}
 
@@ -1710,7 +1962,9 @@ class WP_L10n_Validator {
 			. "\n\t In switch case: " . ( $this->in_switch_case ? 'yes' : 'no' )
 			. "\n\t In new class: " . ( $this->in_new_class ? 'yes' : 'no' )
 			. "\n\t In function declaration: " . ( $this->in_func_declaration ? $this->in_func_declaration : 'no' )
+			. "\n\t In class property: " . ( $this->cur_prop ? $this->cur_prop : 'no' )
 			. $in_class
+			. $in_interface
 			. $func_stack
 		);
 	}
@@ -1854,6 +2108,7 @@ class WP_L10n_Validator {
 
 			$parser->one_by_one = $args['one-by-one'];
 			$parser->update_ignored_functions( $args['ignored-functions'] );
+			$parser->update_ignored_properties( $args['ignored-properties'] );
 			$parser->update_ignored_strings( $args['ignored-strings'] );
 			$parser->update_ignored_atts( $args['ignored-atts'] );
 
@@ -1919,6 +2174,7 @@ class WP_L10n_Validator {
 				'config'            => 'wordpress',
 				'one-by-one'        => false,
 				'ignored-functions' => array(),
+				'ignored-properties'=> array(),
 				'ignored-strings'   => array(),
 				'ignored-atts'      => array(),
 			)

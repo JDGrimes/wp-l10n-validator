@@ -11,7 +11,17 @@ function some_func() {
 	// See #5
 }
 
+class IMHO {
+	protected $ignored = 'imho' _debug_ ; _debug_
+}
+
 class FWIW extends IMHO {
+
+	var $var _debug_;
+	public $public _debug_;
+	protected $protected _debug_;
+	private $private _debug_;
+	public $ignored = 'fwiw' _debug_;
 
 	private function private_thoughts( _debug_ );
 
@@ -42,6 +52,25 @@ $wpdb->query( _debug_ );
 
 $query = new WP_Query( _debug_ );
 
-$func = function() {}
+$func = function() {};
 
 get_some_class()->method( _debug_ );
+
+interface ParentI {
+	public function parent_method( $var _debug_ );
+}
+
+interface ChildI extends ParentI {
+	public function ignored( $var = 'something' _debug_ );
+}
+
+interface AnotherI {}
+
+class Implementor implements ChildI, AnotherI {
+
+	public function parent_method( $var _debug_ ) {
+		$this->ignored( 'ignore me' _debug_ );
+	}
+
+	public function ignored( $var = 'something' _debug_ ) {}
+}

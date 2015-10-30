@@ -40,6 +40,7 @@ $parser->add_ignored_functions(
 		'explode'      => true,
 		'file_exists'  => true,
 		'glob'         => true,
+		'hash'         => true,
 		'implode'      => true,
 		'in_array'     => true,
 		'ltrim'        => true,

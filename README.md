@@ -16,7 +16,7 @@ Installation
 
 **Requires:** PHP 5.3 or later.
 
-Download a zip, clone the repo, or add to composer dependecies. Add the `/bin` directory to your `$PATH` (or use
+Download a zip, clone the repo, or add to composer dependencies. Add the `/bin` directory to your `$PATH` (or use
 `/path/to/wp-l10n-validator/bin/wp-l10n-validator` instead of just `wp-l10n-validator`
 in your commands.
 
@@ -68,11 +68,11 @@ can be completely customized, the main reason for additional configuration is to
 the parser weed out false positives. The strategy employed for weeding out most false
 positives is as follows:
 
-* Ignore non-tranlatable strings inside calls to certain functions
+* Ignore non-translatable strings inside calls to certain functions
 * Ignore specific function arguments that don't need to be gettexted
 * Ignore certain HTML attributes' values
 * Ignore specific strings
-* Ignore specific string occurrances
+* Ignore specific string occurrences
 
 All of these are configurable to match your particular project, though custom
 configuration is optional. To configure the parser, you can add a JSON file named
@@ -81,7 +81,7 @@ to run the parser from).
 
 These are the options that you can specify in the the JSON config file:
 
- * `textdomain` - Your project's texdomain.
+ * `textdomain` - Your project's textdomain.
  * `basedir` - The main directory of your project (if different from the current directory).
  * `config` - The configuration to use ([see CLI arguments above](#usage)).
  * `cache` - The file to store the cache in. The default is `wp-l10n-validator.cache`.
@@ -91,7 +91,7 @@ These are the options that you can specify in the the JSON config file:
    against the ignores cache. The default is 5.
  * `ignored-functions` - An associative array of functions to ignore. The value can be
    an array of specific arguments to be ignored (by argument number), or simply `true`.
-   To ignore a class method, add it like this `My_Class::my_method`. This will only
+   To ignore a class method, add it like this: `My_Class::my_method`. This will only
    ignore the method when it is being called statically from outside the class like
    `My_Class::my_method()`, or inside the class with `self::` or `$this->`. The parser
    does not know what class is assigned to a variable, though it does know the
@@ -100,7 +100,16 @@ These are the options that you can specify in the the JSON config file:
    a class constructor (`My_Class::__construct`) will ignore `new My_Class()`. Calls
    within a class to `parent::method()` will be mapped to the class that is specified
    in the `extends` statement. If a method is being ignored in a parent class, it
-   will also be ignored in child classes as well.
+   will also be ignored in child classes as well. If a method is being ignored in an
+   interface, all classes that implement that interface will have that method ignored
+   as well (since 0.3.0).
+ * `ignored-properties` - (0.3.0+) An associative array of class properties to ignore.
+   The values are currently just expected to be `true`. To ignore any strings in the
+   default value for a property, add it like this: `My_Class::$my_property`. This
+   will only ignore the declared value of the property, it will not ignore
+   assignments (yet). It is possible to ignore the default values for the property in
+   all classes that extend a particular parent class by using the parent class name:
+   `Parent_Class::$property`.
  * `ignored-strings` - An array of strings that should always be ignored.
  * `ignored-atts` - An array of HTML attributes to ignore.
  * `ignored-paths` - An array of file and folder paths to ignore. (Since 0.2.0)

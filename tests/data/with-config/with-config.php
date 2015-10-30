@@ -22,3 +22,7 @@ function display_message() {
 	_e( 'Message', 'textdomain' );
 	func_to_ignore( 'yes' );
 }
+
+class AClass {
+	protected $ignored = 'parent';
+}
