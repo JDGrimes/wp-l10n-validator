@@ -613,7 +613,7 @@ class WP_L10n_Validator {
 	 */
 	public function add_ignored_atts( array $atts ) {
 
-		$this->ignored_atts += $atts;
+		$this->ignored_atts = array_merge( $this->ignored_atts, $atts );
 	}
 
 	/**
