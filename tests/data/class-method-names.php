@@ -56,6 +56,13 @@ $func = function() {};
 
 get_some_class()->method( _debug_ );
 
+wordpoints_component( $var )
+	->get_sub_app( $var )
+	->get_sub_app( _debug_ );
+
+$var
+	->wrap( _debug_ );
+
 interface ParentI {
 	public function parent_method( $var _debug_ );
 }
