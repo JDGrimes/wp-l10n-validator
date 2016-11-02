@@ -45,6 +45,7 @@ $parser->add_ignored_functions(
 		'in_array'     => true,
 		'ltrim'        => true,
 		'preg_replace' => true,
+		'preg_quote'   => array( 2 ),
 		'sprintf'      => array( 2, 3, 4 ), // More args could be added
 		'str_repeat'   => true,
 		'str_replace'  => true,

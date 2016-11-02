@@ -72,6 +72,8 @@ class Class_Method_Name_Test extends WP_L10n_Validator_UnitTestCase {
 			'$wpdb->query',
 			'WP_Query::__construct',
 			'(unknown)->method',
+			'(unknown)->get_sub_app',
+			'$var->wrap',
 			'ParentI::parent_method',
 			'ChildI::ignored',
 			'Implementor::parent_method',

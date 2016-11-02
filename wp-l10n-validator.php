@@ -613,7 +613,7 @@ class WP_L10n_Validator {
 	 */
 	public function add_ignored_atts( array $atts ) {
 
-		$this->ignored_atts += $atts;
+		$this->ignored_atts = array_merge( $this->ignored_atts, $atts );
 	}
 
 	/**
@@ -1033,8 +1033,17 @@ class WP_L10n_Validator {
 
 								case '::':
 								case '->':
-									if ( isset( $tokens[ $index - 2 ][1] ) ) {
-										switch ( $tokens[ $index - 2 ][1] ) {
+									$caller_index = $index - 2;
+
+									if (
+										isset( $tokens[ $caller_index ][0] )
+										&& T_WHITESPACE === $tokens[ $caller_index ][0]
+									) {
+										$caller_index -= 1;
+									}
+
+									if ( isset( $tokens[ $caller_index ][1] ) ) {
+										switch ( $tokens[ $caller_index ][1] ) {
 
 											case 'self':
 											case '$this':
@@ -1055,7 +1064,7 @@ class WP_L10n_Validator {
 											// fallthru
 
 											default:
-												$full_function = $tokens[ $index - 2 ][1] . $tokens[ $index - 1 ][1] . $full_function;
+												$full_function = $tokens[ $caller_index ][1] . $tokens[ $index - 1 ][1] . $full_function;
 										}
 
 									} else {
