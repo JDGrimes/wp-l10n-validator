@@ -2133,8 +2133,16 @@ class WP_L10n_Validator {
 
 		if ( isset( $files ) ) {
 			foreach ( $files as $file ) {
-				if ( ! $parser->is_ignored_file( '/' . $file ) ) {
-					$parser->parse_file( '/' . $file );
+				if ( '.' !== $file{0} && '/' !== $file{0} ) {
+					$file = './' . $file;
+				}
+
+				$file = self::resolve_path( $file );
+
+				$file = substr( $file, strlen( $parser->basedir ) );
+
+				if ( ! $parser->is_ignored_file( $file ) ) {
+					$parser->parse_file( $file );
 				}
 			}
 		} else {
