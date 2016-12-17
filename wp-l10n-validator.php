@@ -2133,7 +2133,9 @@ class WP_L10n_Validator {
 
 		if ( isset( $files ) ) {
 			foreach ( $files as $file ) {
-				$parser->parse_file( '/' . $file );
+				if ( ! $parser->is_ignored_file( '/' . $file ) ) {
+					$parser->parse_file( '/' . $file );
+				}
 			}
 		} else {
 			// Parse the project.

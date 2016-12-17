@@ -94,6 +94,10 @@ class WP_L10n_Validator_CLI_Test extends PHPUnit_Framework_TestCase {
 		$output = $this->run_command( 'wp-l10n-validator textdomain -- other.php no-config.php', '/no-config' );
 		$this->assertEquals( "/no-config.php#16: Non gettexted string 'Hello world'", $output );
 		$this->assertEquals( 1, $this->exit_code );
+
+		$output = $this->run_command( 'wp-l10n-validator textdomain -- ignored.php with-config.php', '/with-config' );
+		$this->assertEquals( "/with-config.php#16: Non gettexted string 'Hello world'", $output );
+		$this->assertEquals( 1, $this->exit_code );
 	}
 
 	/**
