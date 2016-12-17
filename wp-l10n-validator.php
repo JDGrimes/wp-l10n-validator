@@ -2098,6 +2098,11 @@ class WP_L10n_Validator {
 
 			global $argv;
 
+			if ( ($key = array_search( '--', $argv )) ) {
+				$files = array_slice( $argv, $key + 1 );
+				$argv = array_slice( $argv, 0, $key );
+			}
+
 			$args = static::parse_cli_args( $argv );
 
 			$class = get_called_class();
@@ -2126,8 +2131,14 @@ class WP_L10n_Validator {
 			}
 		}
 
-		// Parse the project.
-		$parser->parse();
+		if ( isset( $files ) ) {
+			foreach ( $files as $file ) {
+				$parser->parse_file( '/' . $file );
+			}
+		} else {
+			// Parse the project.
+			$parser->parse();
+		}
 
 		return $parser;
 
@@ -2236,12 +2247,14 @@ class WP_L10n_Validator {
 
 		fwrite(
 			STDERR,
-			"\nUsage: wp-l10n-validator -[1c] TEXTDOMAIN [CONFIG]\n\n"
+			"\nUsage: wp-l10n-validator -[1c] TEXTDOMAIN [CONFIG] [-- FILE ...]\n\n"
 			. "Validate all .php files in the current directory for proper gettexting.\n"
 			. "\nArguments:\n"
 			. "\tTEXTDOMAIN - The textdomain used in the project.\n"
 			. "\tCONFIG - Configuration to use. Corresponds to one of the directories\n"
 			. "\t\t in /config (wordpress by default).\n"
+			. "\tFILE - One or more files to validate. You must pass -- before the\n"
+			. "\t\tlist of files, like this: wp-l10n-validator -- a.php b.php\n"
 			. "\nFlags:\n"
 			. "\t1 - Parse only one file at a time.\n"
 			. "\tc - Generate a specific ignores cache.\n"

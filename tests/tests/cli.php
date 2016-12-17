@@ -77,6 +77,26 @@ class WP_L10n_Validator_CLI_Test extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
+	 * Test passing a list of files to check via the command line.
+	 *
+	 * @since 0.4.0
+	 */
+	public function test_files_passed() {
+
+		$output = $this->run_command( 'wp-l10n-validator -- other.php', '/no-config' );
+		$this->assertEquals( 0, strpos( $output, 'Usage:' ) );
+		$this->assertEquals( 1, $this->exit_code );
+
+		$output = $this->run_command( 'wp-l10n-validator textdomain -- other.php', '/no-config' );
+		$this->assertEquals( '', $output );
+		$this->assertEquals( 0, $this->exit_code );
+
+		$output = $this->run_command( 'wp-l10n-validator textdomain -- other.php no-config.php', '/no-config' );
+		$this->assertEquals( "/no-config.php#16: Non gettexted string 'Hello world'", $output );
+		$this->assertEquals( 1, $this->exit_code );
+	}
+
+	/**
 	 * Run a command and return the output.
 	 *
 	 * @since 0.1.1

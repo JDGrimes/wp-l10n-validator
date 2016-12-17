@@ -27,13 +27,14 @@ To see the basic usage and check that everything is working, type the command:
 Usage
 -----
 
-`$ wp-l10n-validator -[1c] TEXTDOMAIN [CONFIG]`
+`$ wp-l10n-validator -[1c] TEXTDOMAIN [CONFIG] [-- FILE ...]`
 
 This validates all `.php` files in the current directory for proper gettexting.
 
 Arguments:
  * `TEXTDOMAIN` - The textdomain used in your project.
  * `CONFIG` - Configuration to use. Corressponds to one of the directories in `/config` (`wordpress` by default).
+ * `FILE` - One or more files to validate. You must pass `--` before the list of files, like this: `wp-l10n-validator textdomain -- a.php b.php`
 
 Flags:
  * `1` - Parse only one file at a time.
