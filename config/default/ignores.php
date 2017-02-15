@@ -59,6 +59,7 @@ $parser->add_ignored_functions(
 $parser->add_ignored_atts(
 	array(
 		'action',
+		'aria-hidden',
 		'autocomplete',
 		'class',
 		'enctype',
