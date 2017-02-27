@@ -10,6 +10,7 @@
 $parser->add_ignored_functions(
 	array(
 		// Functions.
+		'_get_list_table'       => array( 1 ),
 		'_deprecated_argument'  => array( 1, 2 ),
 		'_deprecated_file'      => array( 1, 2 ),
 		'_deprecated_function'  => true,
