@@ -53,6 +53,9 @@ $parser->add_ignored_functions(
 		'uasort'       => true,
 		'usort'        => true,
 		'version_compare' => true,
+		
+		// Predefined methods.
+		'DateTime::__construct' => true,
 	)
 );
 
