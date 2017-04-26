@@ -28,6 +28,7 @@ $parser->add_ignored_functions(
 		'apply_filters'         => array( 1 ),
 		'check_admin_referer'   => true,
 		'check_ajax_referer'    => true,
+		'checked'               => true,
 		'current_time'          => true,
 		'current_user_can'      => true,
 		'dbDelta'               => true,
