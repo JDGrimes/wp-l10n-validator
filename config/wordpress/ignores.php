@@ -96,6 +96,7 @@ $parser->add_ignored_functions(
 		'wp_redirect'           => true,
 		'wp_register_script'    => true,
 		'wp_register_style'     => true,
+		'wp_reschedule_event'   => array( 1, 2, 3 ),
 		'wp_reset_vars'         => true,
 		'wp_safe_redirect'      => true,
 		'wp_schedule_event'     => array( 1, 2, 3 ),
