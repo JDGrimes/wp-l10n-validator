@@ -52,3 +52,6 @@ add_meta_box(
 		'slug'        => $slug,
 	)
 );
+
+$class_name = 'Some_Class_To_Ignore';
+$constant_name = 'SOMETHING_IGNORED';

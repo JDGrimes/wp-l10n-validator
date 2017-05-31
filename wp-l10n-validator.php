@@ -1739,8 +1739,8 @@ class WP_L10n_Validator {
 
 		if ( ! strpos( $text, ' ' ) ) {
 
-			// Filter out all-lowercase strings with an underscore in them: ignore_this
-			if ( strpos( $text, '_' ) !== false && strtolower( $text ) === $text )
+			// Filter out strings with an underscore in them: ignore_this And_This.
+			if ( strpos( $text, '_' ) !== false )
 				return false;
 
 			// Filter out URLs.
