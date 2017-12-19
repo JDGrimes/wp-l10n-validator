@@ -1,14 +1,24 @@
+# Travis CI config.
+
 language: php
-php:
-  - 7.1
-  - 7.0
-  - 5.6
-  - 5.5
-  - 5.4
-  - 5.3
+
+matrix:
+  include:
+    - php: 7.2
+    - php: 7.1
+    - php: 7.0
+    - php: 5.6
+    - php: 5.5
+    - php: 5.4
+    # Use Ubuntu Precise because Trusty doesn't support PHP 5.3.
+    - php: 5.3
+      dist: precise
+    - php: nightly
+  allow_failures:
+    - php: nightly
 
 before_script: |
-  if [[ ${TRAVIS_PHP_VERSION:0:2} == "7." ]]; then
+  if [[ ${TRAVIS_PHP_VERSION:0:2} == "7." || $TRAVIS_PHP_VERSION == nightly ]]; then
     export PATH="$HOME/.composer/vendor/bin:$PATH"
     composer global require "phpunit/phpunit=^5.7.15"
   fi
