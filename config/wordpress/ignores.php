@@ -46,6 +46,7 @@ $parser->add_ignored_functions(
 		'get_post_type_archive_link' => true,
 		'get_post_types'        => array( 2, 3 ),
 		'get_site_transient'    => true,
+		'get_submit_button'     => array( 2, 3, 4 ),
 		'get_term'              => true,
 		'get_transient'         => true,
 		'get_user_by'           => true,
