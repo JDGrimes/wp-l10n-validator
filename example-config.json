@@ -4,6 +4,9 @@
 	"config":"wordpress",
 	"cache":"wp-l10n-validator-cache.json",
 	"ignores-cache":"wp-l10n-validator-ignores.json",
+	"ignores-rules": {
+		"all-lowercase": true
+	},
 	"ignored-functions": {
 		"my_plugin_func":true,
 		"my_plugin_do_something":true,

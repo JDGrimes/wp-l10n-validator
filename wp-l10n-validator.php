@@ -311,6 +311,17 @@ class WP_L10n_Validator {
 	public $ignores_tolerance = 5;
 
 	/**
+	 * Rules to apply to strings to determine if they should be ignored.
+	 *
+	 * @since 0.4.0
+	 *
+	 * @var array
+	 */
+	public $ignores_rules = array(
+		'all-lowercase' => false,
+	);
+
+	/**
 	 * The debug marker.
 	 *
 	 * When this token is encountered, the debug_callback() method is called.
@@ -653,6 +664,19 @@ class WP_L10n_Validator {
 			$this->ignored_strings
 			, array_flip( (array) $strings )
 		);
+	}
+
+	/**
+	 * Update the ignores rules settings.
+	 *
+	 * @since 0.4.0
+	 *
+	 * @param bool[] $rules An array of rules to enable/disable. Keys are the rule
+	 *                      names, values true (to enable) or false (to disable).
+	 */
+	public function update_ignores_rules( array $rules ) {
+
+		$this->ignores_rules = array_merge( $this->ignores_rules, $rules );
 	}
 
 	/**
@@ -1644,6 +1668,13 @@ class WP_L10n_Validator {
 	 */
 	private function prepare_non_gettext( $text ) {
 
+		if (
+			! empty( $this->ignores_rules['all-lowercase'] )
+			&& strtolower( $text ) === $text
+		) {
+			return false;
+		}
+
 		if ( strpos( $text, '<' ) !== false ) {
 
 			/*
@@ -2128,6 +2159,7 @@ class WP_L10n_Validator {
 			}
 
 			$parser->one_by_one = $args['one-by-one'];
+			$parser->update_ignores_rules( $args['ignores-rules'] );
 			$parser->update_ignored_functions( $args['ignored-functions'] );
 			$parser->update_ignored_properties( $args['ignored-properties'] );
 			$parser->update_ignored_strings( $args['ignored-strings'] );
@@ -2214,6 +2246,7 @@ class WP_L10n_Validator {
 				'ignored-properties'=> array(),
 				'ignored-strings'   => array(),
 				'ignored-atts'      => array(),
+				'ignores-rules'     => array(),
 			)
 			, self::$config
 		);
