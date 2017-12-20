@@ -85,9 +85,9 @@ These are the options that you can specify in the the JSON config file:
  * `textdomain` - Your project's textdomain.
  * `basedir` - The main directory of your project (if different from the current directory).
  * `config` - The configuration to use ([see CLI arguments above](#usage)).
- * `cache` - The file to store the cache in. The default is `wp-l10n-validator.cache`.
+ * `cache` - The file to store the cache in. The default is `.wp-l10n-validator-cache.json`.
  * `ignores-cache` - The file to store the specific ignores cache in. The default is
-   `wp-l10n-validator-ignores.cache`. See the `-c` flag above for more information.
+   `.wp-l10n-validator-ignores-cache.json`. See the `-c` flag above for more information.
  * `ignores-tolerance` - The number of lines of difference to allow for when checking
    against the ignores cache. The default is 5.
  * `ignores-rules` - Configure which rules are used to determine if a string should be

@@ -65,7 +65,7 @@ class WP_L10n_Validator_CLI_Test extends PHPUnit_Framework_TestCase {
 		$this->assertEmpty( $output );
 		$this->assertEquals( 0, $this->exit_code );
 
-		$ignores_cache = dirname( __DIR__ ) . '/data/with-config/wp-l10n-validator-ignores.cache';
+		$ignores_cache = dirname( __DIR__ ) . '/data/with-config/.wp-l10n-validator-ignores-cache.json';
 
 		if ( ! ($content = @file_get_contents( $ignores_cache )) )
 			$this->fail( 'The ignores cache file was not generated, or could not be read.' );
@@ -140,7 +140,7 @@ class WP_L10n_Validator_CLI_Test extends PHPUnit_Framework_TestCase {
 			fclose( $pipes[3] );
 			proc_close( $process );
 
-			@unlink( $working_dir . '/wp-l10n-validator.cache' );
+			@unlink( $working_dir . '/.wp-l10n-validator-cache.json' );
 
 			return trim( $output );
 		}

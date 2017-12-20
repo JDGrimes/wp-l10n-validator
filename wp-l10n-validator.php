@@ -245,8 +245,8 @@ class WP_L10n_Validator {
 	 * @type array $config
 	 */
 	protected static $config = array(
-		'ignores-cache' => 'wp-l10n-validator-ignores.cache',
-		'cache'         => 'wp-l10n-validator.cache',
+		'ignores-cache' => '.wp-l10n-validator-ignores-cache.json',
+		'cache'         => '.wp-l10n-validator-cache.json',
 	);
 
 	//
@@ -445,7 +445,7 @@ class WP_L10n_Validator {
 	public function load_cache() {
 
 		if ( empty( $this->cache_file ) )
-			$this->cache_file = $this->basedir . '/wp-l10n-validator.cache';
+			$this->cache_file = $this->basedir . '/.wp-l10n-validator-cache.json';
 
 		$cache = self::load_json_file( $this->cache_file );
 
