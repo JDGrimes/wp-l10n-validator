@@ -90,6 +90,17 @@ These are the options that you can specify in the the JSON config file:
    `wp-l10n-validator-ignores.cache`. See the `-c` flag above for more information.
  * `ignores-tolerance` - The number of lines of difference to allow for when checking
    against the ignores cache. The default is 5.
+ * `ignores-rules` - Configure which rules are used to determine if a string should be
+   ignored. It is an associative array with boolean values:
+   * `all-lowercase` — Ignore all strings that contain no uppercase characters. This
+     is a very useful rule to enable if you don't use any translatable strings that
+     are all lowercase. It is disabled by default to avoid false negatives. Add this
+     to your config to enable it:
+     ```json
+     	"ignores-rules": {
+     		"all-lowercase": true
+     	},
+	 ```
  * `ignored-functions` - An associative array of functions to ignore. The value can be
    an array of specific arguments to be ignored (by argument number), or simply `true`.
    To ignore a class method, add it like this: `My_Class::my_method`. This will only
