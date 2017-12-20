@@ -1,6 +1,7 @@
 {
 	"textdomain":"textdomain",
 	"config":"wordpress",
+	"ignored-paths": [ "/ignored" ],
 	"ignored-functions": {
 		"func_to_ignore":true
 	},

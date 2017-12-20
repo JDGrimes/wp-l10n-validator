@@ -52,3 +52,11 @@ add_meta_box(
 		'slug'        => $slug,
 	)
 );
+
+$class_name = 'Some_Class_To_Ignore';
+$constant_name = 'SOMETHING_IGNORED';
+
+$class_name = 'some-class';
+$class_name = 'another-';
+$string = 'a string-with-hyphens';
+$string = 'Twenty-one';

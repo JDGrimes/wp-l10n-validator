@@ -245,8 +245,8 @@ class WP_L10n_Validator {
 	 * @type array $config
 	 */
 	protected static $config = array(
-		'ignores-cache' => 'wp-l10n-validator-ignores.cache',
-		'cache'         => 'wp-l10n-validator.cache',
+		'ignores-cache' => '.wp-l10n-validator-ignores-cache.json',
+		'cache'         => '.wp-l10n-validator-cache.json',
 	);
 
 	//
@@ -309,6 +309,17 @@ class WP_L10n_Validator {
 	 * @type int $ignores_tolerance
 	 */
 	public $ignores_tolerance = 5;
+
+	/**
+	 * Rules to apply to strings to determine if they should be ignored.
+	 *
+	 * @since 0.4.0
+	 *
+	 * @var array
+	 */
+	public $ignores_rules = array(
+		'all-lowercase' => false,
+	);
 
 	/**
 	 * The debug marker.
@@ -434,7 +445,7 @@ class WP_L10n_Validator {
 	public function load_cache() {
 
 		if ( empty( $this->cache_file ) )
-			$this->cache_file = $this->basedir . '/wp-l10n-validator.cache';
+			$this->cache_file = $this->basedir . '/.wp-l10n-validator-cache.json';
 
 		$cache = self::load_json_file( $this->cache_file );
 
@@ -653,6 +664,19 @@ class WP_L10n_Validator {
 			$this->ignored_strings
 			, array_flip( (array) $strings )
 		);
+	}
+
+	/**
+	 * Update the ignores rules settings.
+	 *
+	 * @since 0.4.0
+	 *
+	 * @param bool[] $rules An array of rules to enable/disable. Keys are the rule
+	 *                      names, values true (to enable) or false (to disable).
+	 */
+	public function update_ignores_rules( array $rules ) {
+
+		$this->ignores_rules = array_merge( $this->ignores_rules, $rules );
 	}
 
 	/**
@@ -1644,6 +1668,13 @@ class WP_L10n_Validator {
 	 */
 	private function prepare_non_gettext( $text ) {
 
+		if (
+			! empty( $this->ignores_rules['all-lowercase'] )
+			&& strtolower( $text ) === $text
+		) {
+			return false;
+		}
+
 		if ( strpos( $text, '<' ) !== false ) {
 
 			/*
@@ -1739,8 +1770,12 @@ class WP_L10n_Validator {
 
 		if ( ! strpos( $text, ' ' ) ) {
 
-			// Filter out all-lowercase strings with an underscore in them: ignore_this
-			if ( strpos( $text, '_' ) !== false && strtolower( $text ) === $text )
+			// Filter out strings with an underscore in them: ignore_this And_This.
+			if ( strpos( $text, '_' ) !== false )
+				return false;
+
+			// Filter out strings with a hyphen in them: ignore-this.
+			if ( strpos( $text, '-' ) !== false && strtolower( $text ) === $text )
 				return false;
 
 			// Filter out URLs.
@@ -1784,26 +1819,31 @@ class WP_L10n_Validator {
 	protected function looks_like_mysql( $text ) {
 
 		static $mysql_keywords = array(
-			'ASC',
-			'COUNT',
-			'DESC',
-			'IN (',
-			'NOT',
-			'SELECT',
-			'WHERE',
-			'LIMIT',
-			'CHARACTER SET',
-			'DEFAULT',
-			'COLLATE',
-			'CREATE',
-			'TABLE',
 			'AND',
-			'LIKE',
-			'ORDER BY',
-			'CAST(',
-			'FROM',
+			'ASC',
 			'BIGINT',
+			'CAST(',
+			'CHARACTER SET',
+			'COLLATE',
+			'COUNT',
+			'CREATE',
+			'DEFAULT',
+			'DESC',
+			'EXISTS',
+			'FROM',
+			'GROUP BY',
+			'HAVING',
+			'IN (',
 			'JOIN',
+			'LIKE',
+			'LIMIT',
+			'NOT',
+			'ORDER BY',
+			'SELECT',
+			'SIGNED',
+			'TABLE',
+			'UNION ALL',
+			'WHERE',
 		);
 
 		foreach ( $mysql_keywords as $keyword ) {
@@ -2098,6 +2138,11 @@ class WP_L10n_Validator {
 
 			global $argv;
 
+			if ( ($key = array_search( '--', $argv )) ) {
+				$files = array_slice( $argv, $key + 1 );
+				$argv = array_slice( $argv, 0, $key );
+			}
+
 			$args = static::parse_cli_args( $argv );
 
 			$class = get_called_class();
@@ -2116,6 +2161,7 @@ class WP_L10n_Validator {
 			}
 
 			$parser->one_by_one = $args['one-by-one'];
+			$parser->update_ignores_rules( $args['ignores-rules'] );
 			$parser->update_ignored_functions( $args['ignored-functions'] );
 			$parser->update_ignored_properties( $args['ignored-properties'] );
 			$parser->update_ignored_strings( $args['ignored-strings'] );
@@ -2126,8 +2172,24 @@ class WP_L10n_Validator {
 			}
 		}
 
-		// Parse the project.
-		$parser->parse();
+		if ( isset( $files ) ) {
+			foreach ( $files as $file ) {
+				if ( '.' !== $file{0} && '/' !== $file{0} ) {
+					$file = './' . $file;
+				}
+
+				$file = self::resolve_path( $file );
+
+				$file = substr( $file, strlen( $parser->basedir ) );
+
+				if ( ! $parser->is_ignored_file( $file ) ) {
+					$parser->parse_file( $file );
+				}
+			}
+		} else {
+			// Parse the project.
+			$parser->parse();
+		}
 
 		return $parser;
 
@@ -2186,6 +2248,7 @@ class WP_L10n_Validator {
 				'ignored-properties'=> array(),
 				'ignored-strings'   => array(),
 				'ignored-atts'      => array(),
+				'ignores-rules'     => array(),
 			)
 			, self::$config
 		);
@@ -2236,12 +2299,14 @@ class WP_L10n_Validator {
 
 		fwrite(
 			STDERR,
-			"\nUsage: wp-l10n-validator -[1c] TEXTDOMAIN [CONFIG]\n\n"
+			"\nUsage: wp-l10n-validator -[1c] TEXTDOMAIN [CONFIG] [-- FILE ...]\n\n"
 			. "Validate all .php files in the current directory for proper gettexting.\n"
 			. "\nArguments:\n"
 			. "\tTEXTDOMAIN - The textdomain used in the project.\n"
 			. "\tCONFIG - Configuration to use. Corresponds to one of the directories\n"
 			. "\t\t in /config (wordpress by default).\n"
+			. "\tFILE - One or more files to validate. You must pass -- before the\n"
+			. "\t\tlist of files, like this: wp-l10n-validator -- a.php b.php\n"
 			. "\nFlags:\n"
 			. "\t1 - Parse only one file at a time.\n"
 			. "\tc - Generate a specific ignores cache.\n"

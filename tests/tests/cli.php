@@ -33,7 +33,7 @@ class WP_L10n_Validator_CLI_Test extends PHPUnit_Framework_TestCase {
 
 		$output = $this->run_command( 'wp-l10n-validator textdomain default', '/no-config' );
 		$this->assertEquals(
-			"/no-config.php#9 apply_filters( 1 ): Non gettexted string 'some-filter'"
+			"/no-config.php#9 apply_filters( 1 ): Non gettexted string 'some filter'"
 			. "\n/no-config.php#16: Non gettexted string 'Hello world'"
 			. "\n/no-config.php#21 _e( 1 ): Non gettexted string 'Message'"
 			. "\n/no-config.php#21 _e( 2 ): Non gettexted string 'textdomain'"
@@ -65,7 +65,7 @@ class WP_L10n_Validator_CLI_Test extends PHPUnit_Framework_TestCase {
 		$this->assertEmpty( $output );
 		$this->assertEquals( 0, $this->exit_code );
 
-		$ignores_cache = dirname( __DIR__ ) . '/data/with-config/wp-l10n-validator-ignores.cache';
+		$ignores_cache = dirname( __DIR__ ) . '/data/with-config/.wp-l10n-validator-ignores-cache.json';
 
 		if ( ! ($content = @file_get_contents( $ignores_cache )) )
 			$this->fail( 'The ignores cache file was not generated, or could not be read.' );
@@ -74,6 +74,37 @@ class WP_L10n_Validator_CLI_Test extends PHPUnit_Framework_TestCase {
 
 		$this->assertEquals( array( '/with-config.php' => array( 'Hello world' => array( 16 => false ) ) ), json_decode( $content, true ) );
 		$this->assertEquals( 0, $this->exit_code );
+	}
+
+	/**
+	 * Test passing a list of files to check via the command line.
+	 *
+	 * @since 0.4.0
+	 */
+	public function test_files_passed() {
+
+		$output = $this->run_command( 'wp-l10n-validator -- other.php', '/no-config' );
+		$this->assertEquals( 0, strpos( $output, 'Usage:' ) );
+		$this->assertEquals( 1, $this->exit_code );
+
+		$output = $this->run_command( 'wp-l10n-validator textdomain -- other.php', '/no-config' );
+		$this->assertEquals( '', $output );
+		$this->assertEquals( 0, $this->exit_code );
+
+		// With a dot before the file name.
+		$output = $this->run_command( 'wp-l10n-validator textdomain -- ./no-config.php', '/no-config' );
+		$this->assertEquals( "/no-config.php#16: Non gettexted string 'Hello world'", $output );
+		$this->assertEquals( 1, $this->exit_code );
+
+		// Multiple files.
+		$output = $this->run_command( 'wp-l10n-validator textdomain -- other.php no-config.php', '/no-config' );
+		$this->assertEquals( "/no-config.php#16: Non gettexted string 'Hello world'", $output );
+		$this->assertEquals( 1, $this->exit_code );
+
+		// Passing an ignored file.
+		$output = $this->run_command( 'wp-l10n-validator textdomain -- ignored.php with-config.php', '/with-config' );
+		$this->assertEquals( "/with-config.php#16: Non gettexted string 'Hello world'", $output );
+		$this->assertEquals( 1, $this->exit_code );
 	}
 
 	/**
@@ -109,7 +140,7 @@ class WP_L10n_Validator_CLI_Test extends PHPUnit_Framework_TestCase {
 			fclose( $pipes[3] );
 			proc_close( $process );
 
-			@unlink( $working_dir . '/wp-l10n-validator.cache' );
+			@unlink( $working_dir . '/.wp-l10n-validator-cache.json' );
 
 			return trim( $output );
 		}

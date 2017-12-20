@@ -27,13 +27,14 @@ To see the basic usage and check that everything is working, type the command:
 Usage
 -----
 
-`$ wp-l10n-validator -[1c] TEXTDOMAIN [CONFIG]`
+`$ wp-l10n-validator -[1c] TEXTDOMAIN [CONFIG] [-- FILE ...]`
 
 This validates all `.php` files in the current directory for proper gettexting.
 
 Arguments:
  * `TEXTDOMAIN` - The textdomain used in your project.
  * `CONFIG` - Configuration to use. Corressponds to one of the directories in `/config` (`wordpress` by default).
+ * `FILE` - One or more files to validate. You must pass `--` before the list of files, like this: `wp-l10n-validator textdomain -- a.php b.php`
 
 Flags:
  * `1` - Parse only one file at a time.
@@ -84,11 +85,22 @@ These are the options that you can specify in the the JSON config file:
  * `textdomain` - Your project's textdomain.
  * `basedir` - The main directory of your project (if different from the current directory).
  * `config` - The configuration to use ([see CLI arguments above](#usage)).
- * `cache` - The file to store the cache in. The default is `wp-l10n-validator.cache`.
+ * `cache` - The file to store the cache in. The default is `.wp-l10n-validator-cache.json`.
  * `ignores-cache` - The file to store the specific ignores cache in. The default is
-   `wp-l10n-validator-ignores.cache`. See the `-c` flag above for more information.
+   `.wp-l10n-validator-ignores-cache.json`. See the `-c` flag above for more information.
  * `ignores-tolerance` - The number of lines of difference to allow for when checking
    against the ignores cache. The default is 5.
+ * `ignores-rules` - Configure which rules are used to determine if a string should be
+   ignored. It is an associative array with boolean values:
+   * `all-lowercase` — Ignore all strings that contain no uppercase characters. This
+     is a very useful rule to enable if you don't use any translatable strings that
+     are all lowercase. It is disabled by default to avoid false negatives. Add this
+     to your config to enable it:
+     ```json
+     	"ignores-rules": {
+     		"all-lowercase": true
+     	},
+	 ```
  * `ignored-functions` - An associative array of functions to ignore. The value can be
    an array of specific arguments to be ignored (by argument number), or simply `true`.
    To ignore a class method, add it like this: `My_Class::my_method`. This will only

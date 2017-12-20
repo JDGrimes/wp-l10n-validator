@@ -6,7 +6,7 @@
 
 function do_some_things( $var ) {
 
-	$var = apply_filters( 'some-filter' );
+	$var = apply_filters( 'some filter' );
 
 	return $var;
 }

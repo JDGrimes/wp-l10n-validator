@@ -10,6 +10,7 @@
 $parser->add_ignored_functions(
 	array(
 		// Functions.
+		'_get_list_table'       => array( 1 ),
 		'_deprecated_argument'  => array( 1, 2 ),
 		'_deprecated_file'      => array( 1, 2 ),
 		'_deprecated_function'  => true,
@@ -27,6 +28,7 @@ $parser->add_ignored_functions(
 		'apply_filters'         => array( 1 ),
 		'check_admin_referer'   => true,
 		'check_ajax_referer'    => true,
+		'checked'               => true,
 		'current_time'          => true,
 		'current_user_can'      => true,
 		'dbDelta'               => true,
@@ -44,6 +46,7 @@ $parser->add_ignored_functions(
 		'get_post_type_archive_link' => true,
 		'get_post_types'        => array( 2, 3 ),
 		'get_site_transient'    => true,
+		'get_submit_button'     => array( 2, 3, 4 ),
 		'get_term'              => true,
 		'get_transient'         => true,
 		'get_user_by'           => true,
@@ -94,6 +97,7 @@ $parser->add_ignored_functions(
 		'wp_redirect'           => true,
 		'wp_register_script'    => true,
 		'wp_register_style'     => true,
+		'wp_reschedule_event'   => array( 1, 2, 3 ),
 		'wp_reset_vars'         => true,
 		'wp_safe_redirect'      => true,
 		'wp_schedule_event'     => array( 1, 2, 3 ),

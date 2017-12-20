@@ -53,23 +53,32 @@ $parser->add_ignored_functions(
 		'uasort'       => true,
 		'usort'        => true,
 		'version_compare' => true,
+		
+		// Predefined methods.
+		'DateTime::__construct' => true,
 	)
 );
 
 $parser->add_ignored_atts(
 	array(
 		'action',
+		'align',
+		'aria-hidden',
 		'autocomplete',
 		'class',
+		'cols',
 		'enctype',
 		'for',
 		'height',
 		'href',
 		'http-equiv',
 		'id',
+		'max',
 		'method',
+		'min',
 		'name',
 		'onclick',
+		'rows',
 		'scope',
 		'size',
 		'style',
