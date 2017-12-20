@@ -33,7 +33,7 @@ class WP_L10n_Validator_CLI_Test extends PHPUnit_Framework_TestCase {
 
 		$output = $this->run_command( 'wp-l10n-validator textdomain default', '/no-config' );
 		$this->assertEquals(
-			"/no-config.php#9 apply_filters( 1 ): Non gettexted string 'some-filter'"
+			"/no-config.php#9 apply_filters( 1 ): Non gettexted string 'some filter'"
 			. "\n/no-config.php#16: Non gettexted string 'Hello world'"
 			. "\n/no-config.php#21 _e( 1 ): Non gettexted string 'Message'"
 			. "\n/no-config.php#21 _e( 2 ): Non gettexted string 'textdomain'"

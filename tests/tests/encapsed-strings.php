@@ -37,5 +37,7 @@ class WP_L10n_Validator_Untranslated_Encapsed_String_Test extends WP_L10n_Valida
 		$this->assertFoundNonGettextedString( 'Don\'t' );
 		$this->assertFoundNonGettextedString( 'this!' );
 		$this->assertFoundNonGettextedString( 'and/or' );
+		$this->assertFoundNonGettextedString( 'a string-with-hyphens' );
+		$this->assertFoundNonGettextedString( 'Twenty-one' );
 	}
 }

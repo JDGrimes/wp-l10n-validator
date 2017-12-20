@@ -1743,6 +1743,10 @@ class WP_L10n_Validator {
 			if ( strpos( $text, '_' ) !== false )
 				return false;
 
+			// Filter out strings with a hyphen in them: ignore-this.
+			if ( strpos( $text, '-' ) !== false && strtolower( $text ) === $text )
+				return false;
+
 			// Filter out URLs.
 			if ( strpos( $text, 'http' ) === 0 && strpos( $text, '/' ) )
 				return false;
